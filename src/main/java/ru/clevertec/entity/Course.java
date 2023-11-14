@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -18,7 +19,7 @@ import java.util.List;
 @FieldNameConstants
 public class Course {
 
-    private Long id;
+    private UUID id;
 
     private String name;
 
