@@ -1,19 +1,18 @@
-package ru.clevertec.exception.dao;
-
+package ru.clevertec.exception.service;
 
 import ru.clevertec.exception.ApplicationException;
 
 /**
- * Thrown to indicate that DAO can't be launched.
+ * Thrown to indicate that argument not found during a service operation.
  */
-public class DaoException extends ApplicationException {
+public class NotFoundException extends ApplicationException {
 
     /**
      * Constructs a new exception with {@code null} as its
      * detail message.  The cause is not initialized, and may subsequently be
      * initialized by a call to {@link #initCause}.
      */
-    public DaoException() {
+    public NotFoundException() {
         super();
     }
 
@@ -25,7 +24,7 @@ public class DaoException extends ApplicationException {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public DaoException(String message) {
+    public NotFoundException(String message) {
         super(message);
     }
 
@@ -43,7 +42,7 @@ public class DaoException extends ApplicationException {
      *                unknown.)
      * @since 1.4
      */
-    public DaoException(String message, Throwable cause) {
+    public NotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -60,7 +59,7 @@ public class DaoException extends ApplicationException {
      *              unknown.)
      * @since 1.4
      */
-    public DaoException(Throwable cause) {
+    public NotFoundException(Throwable cause) {
         super(cause);
     }
 }

@@ -2,7 +2,7 @@ package ru.clevertec.config;
 
 
 import org.yaml.snakeyaml.Yaml;
-import ru.clevertec.exception.ApplicationException;
+import ru.clevertec.exception.service.NotFoundException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public enum ConfigurationYamlManager {
             Yaml yaml = new Yaml();
             property = yaml.load(is);
         } catch (IOException e) {
-            throw new ApplicationException("Can't find yaml configuration file in path: " + CONFIG_YAML_FILE);
+            throw new NotFoundException("Can't find yaml configuration file in path: " + CONFIG_YAML_FILE);
         }
     }
 

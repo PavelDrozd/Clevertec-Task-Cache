@@ -11,8 +11,8 @@ import ru.clevertec.data.CourseDto;
 import ru.clevertec.data.CourseDtoTestData;
 import ru.clevertec.data.CourseTestData;
 import ru.clevertec.entity.Course;
-import ru.clevertec.exception.service.ServiceNotFoundException;
-import ru.clevertec.exception.service.ServiceValidationException;
+import ru.clevertec.exception.service.NotFoundException;
+import ru.clevertec.exception.service.ValidationException;
 import ru.clevertec.mapper.CourseMapper;
 
 import java.util.List;
@@ -59,7 +59,7 @@ class CourseServiceImplTest {
         String expected = "Course is null";
 
         // when
-        Exception exception = assertThrows(ServiceValidationException.class, () -> courseService.create(null));
+        Exception exception = assertThrows(ValidationException.class, () -> courseService.create(null));
         String actual = exception.getMessage();
 
         // then
@@ -111,7 +111,7 @@ class CourseServiceImplTest {
         String expected = "not found";
 
         // when
-        Exception exception = assertThrows(ServiceNotFoundException.class, () -> courseService.getById(fakeUuid));
+        Exception exception = assertThrows(NotFoundException.class, () -> courseService.getById(fakeUuid));
         String actual = exception.getMessage();
 
         // then
@@ -125,7 +125,7 @@ class CourseServiceImplTest {
         String expected = "ID is null";
 
         // when
-        Exception exception = assertThrows(ServiceValidationException.class, () -> courseService.getById(null));
+        Exception exception = assertThrows(ValidationException.class, () -> courseService.getById(null));
         String actual = exception.getMessage();
 
         // then
@@ -161,7 +161,7 @@ class CourseServiceImplTest {
         String expected = "not found";
 
         // when
-        Exception exception = assertThrows(ServiceNotFoundException.class, () -> courseService.update(fakeUuid, courseDto));
+        Exception exception = assertThrows(NotFoundException.class, () -> courseService.update(fakeUuid, courseDto));
         String actual = exception.getMessage();
 
         // then
@@ -176,7 +176,7 @@ class CourseServiceImplTest {
         String expected = "ID is null";
 
         // when
-        Exception exception = assertThrows(ServiceValidationException.class, () -> courseService.update(uuid, null));
+        Exception exception = assertThrows(ValidationException.class, () -> courseService.update(uuid, null));
         String actual = exception.getMessage();
 
         // then
@@ -191,7 +191,7 @@ class CourseServiceImplTest {
         String expected = "Course is null";
 
         // when
-        Exception exception = assertThrows(ServiceValidationException.class, () -> courseService.update(null, courseDto));
+        Exception exception = assertThrows(ValidationException.class, () -> courseService.update(null, courseDto));
         String actual = exception.getMessage();
 
         // then
@@ -218,7 +218,7 @@ class CourseServiceImplTest {
         String expected = "not found";
 
         // when
-        Exception exception = assertThrows(ServiceNotFoundException.class, () -> courseService.delete(fakeUuid));
+        Exception exception = assertThrows(NotFoundException.class, () -> courseService.delete(fakeUuid));
         String actual = exception.getMessage();
 
         // then
@@ -232,7 +232,7 @@ class CourseServiceImplTest {
         String expected = "ID is null";
 
         // when
-        Exception exception = assertThrows(ServiceValidationException.class, () -> courseService.delete(null));
+        Exception exception = assertThrows(ValidationException.class, () -> courseService.delete(null));
         String actual = exception.getMessage();
 
         // then
