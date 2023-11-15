@@ -36,10 +36,11 @@ public interface AbstractService<K, T> {
     /**
      * Accepts a class, update it and send in DAO.
      *
+     * @param id expected object of type K used as ID.
      * @param t expected object of type T.
      * @return updated object of type T from DAO.
      */
-    T update(T t);
+    T update(K id, T t);
 
     /**
      * Delete existing object by primary key.
