@@ -15,9 +15,11 @@ ext {
     junitVersion = '5.9.2'
     assertJVersion = '3.24.2'
     mockitoVersion = '5.6.0'
+    snakeYamlVersion = '2.1'
 }
 
 dependencies {
+    implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
