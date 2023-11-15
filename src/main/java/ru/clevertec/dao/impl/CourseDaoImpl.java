@@ -4,6 +4,7 @@ import ru.clevertec.dao.CourseDao;
 import ru.clevertec.entity.Course;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CourseDaoImpl implements CourseDao {
 
@@ -18,12 +19,12 @@ public class CourseDaoImpl implements CourseDao {
     }
 
     @Override
-    public Course findById(Long id) {
+    public Course findById(UUID id) {
         return null;
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(UUID id) {
 
     }
 }
