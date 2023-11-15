@@ -4,6 +4,7 @@ import ru.clevertec.data.CourseDto;
 import ru.clevertec.service.CourseService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CourseServiceImpl implements CourseService {
 
@@ -18,7 +19,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseDto getById(Long id) {
+    public CourseDto getById(UUID id) {
         return null;
     }
 
@@ -28,7 +29,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(UUID id) {
 
     }
 }
