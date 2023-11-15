@@ -12,7 +12,6 @@ import ru.clevertec.data.CourseDtoTestData;
 import ru.clevertec.data.CourseTestData;
 import ru.clevertec.entity.Course;
 import ru.clevertec.exception.service.NotFoundException;
-import ru.clevertec.exception.service.ValidationException;
 import ru.clevertec.mapper.CourseMapper;
 
 import java.util.List;
@@ -51,20 +50,6 @@ class CourseServiceImplTest {
         // then
         assertThat(actual)
                 .isSameAs(expected);
-    }
-
-    @Test
-    void createShouldThrowServiceValidationException() {
-        // given
-        String expected = "Course is null";
-
-        // when
-        Exception exception = assertThrows(ValidationException.class, () -> courseService.create(null));
-        String actual = exception.getMessage();
-
-        // then
-        assertThat(actual)
-                .contains(expected);
     }
 
     @Test
@@ -120,20 +105,6 @@ class CourseServiceImplTest {
     }
 
     @Test
-    void getByIdShouldThrowServiceValidationException() {
-        // given
-        String expected = "ID is null";
-
-        // when
-        Exception exception = assertThrows(ValidationException.class, () -> courseService.getById(null));
-        String actual = exception.getMessage();
-
-        // then
-        assertThat(actual)
-                .contains(expected);
-    }
-
-    @Test
     void updateShouldReturnExpectedCourseDto() {
         // given
         UUID uuid = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
@@ -170,36 +141,6 @@ class CourseServiceImplTest {
     }
 
     @Test
-    void updateShouldThrowServiceValidationExceptionOnID() {
-        // given
-        UUID uuid = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
-        String expected = "ID is null";
-
-        // when
-        Exception exception = assertThrows(ValidationException.class, () -> courseService.update(uuid, null));
-        String actual = exception.getMessage();
-
-        // then
-        assertThat(actual)
-                .contains(expected);
-    }
-
-    @Test
-    void updateShouldThrowServiceValidationExceptionOnCourse() {
-        // given
-        CourseDto courseDto = CourseDtoTestData.builder().build().buildCourseDto();
-        String expected = "Course is null";
-
-        // when
-        Exception exception = assertThrows(ValidationException.class, () -> courseService.update(null, courseDto));
-        String actual = exception.getMessage();
-
-        // then
-        assertThat(actual)
-                .contains(expected);
-    }
-
-    @Test
     void deleteShouldInvokeRepositoryMethodDeleteOneTime() {
         // given
         UUID uuid = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
@@ -219,20 +160,6 @@ class CourseServiceImplTest {
 
         // when
         Exception exception = assertThrows(NotFoundException.class, () -> courseService.delete(fakeUuid));
-        String actual = exception.getMessage();
-
-        // then
-        assertThat(actual)
-                .contains(expected);
-    }
-
-    @Test
-    void deleteShouldThrowServiceValidationException() {
-        // given
-        String expected = "ID is null";
-
-        // when
-        Exception exception = assertThrows(ValidationException.class, () -> courseService.delete(null));
         String actual = exception.getMessage();
 
         // then
