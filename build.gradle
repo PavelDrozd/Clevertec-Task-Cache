@@ -16,10 +16,18 @@ ext {
     assertJVersion = '3.24.2'
     mockitoVersion = '5.6.0'
     snakeYamlVersion = '2.1'
+    postgresVersion = '42.6.0'
+    hikariCPVersion = '5.1.0'
 }
 
 dependencies {
+
+    implementation "org.postgresql:postgresql:${postgresVersion}"
+
+    implementation "com.zaxxer:HikariCP:${hikariCPVersion}"
+
     implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
+
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
