@@ -1,6 +1,7 @@
 package ru.clevertec.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Abstract interface for CRUD operations.
@@ -31,12 +32,12 @@ public interface AbstractDao<K, T> {
      * @param id accept object of type K used as primary key.
      * @return object of type T.
      */
-    T findById(K id);
+    Optional<T> findById(K id);
 
     /**
      * Delete existing object by primary key.
      *
      * @param id accept object of type K used as primary key.
      */
-    void deleteById(K id);
+    boolean deleteById(K id);
 }
