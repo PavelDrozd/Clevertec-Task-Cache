@@ -1,6 +1,7 @@
 package ru.clevertec.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.clevertec.data.CourseDto;
 import ru.clevertec.entity.Course;
 
@@ -16,6 +17,7 @@ public interface CourseMapper {
      * @param courseDto expected object type of CourseDto.
      * @return mapped Course object
      */
+    @Mapping(target = "id", ignore = true)
     Course toCourse(CourseDto courseDto);
 
     /**
