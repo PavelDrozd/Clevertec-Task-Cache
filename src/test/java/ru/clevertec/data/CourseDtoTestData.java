@@ -32,11 +32,8 @@ public class CourseDtoTestData {
     @Builder.Default
     private Duration duration = Duration.ofDays(180);
 
-    @Builder.Default
-    private List<String> lessonTopics = List.of("OOP", "Java installation", "Git", "Gradle", "Collections", "Concurrency", "Servlets");
-
     public CourseDto buildCourseDto() {
-        return new CourseDto(name, info, cost, discount, start, duration, lessonTopics);
+        return new CourseDto(name, info, cost, discount, start, duration);
     }
 
     public List<CourseDto> buildListOfCourseDtos() {

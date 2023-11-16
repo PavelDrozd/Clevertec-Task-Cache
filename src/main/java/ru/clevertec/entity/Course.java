@@ -9,7 +9,6 @@ import lombok.experimental.FieldNameConstants;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -32,6 +31,4 @@ public class Course {
     private LocalDate start;
 
     private Duration duration;
-
-    private List<String> lessonTopics;
 }

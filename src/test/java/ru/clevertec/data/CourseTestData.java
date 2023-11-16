@@ -33,11 +33,8 @@ public class CourseTestData {
     @Builder.Default
     private Duration duration = Duration.ofDays(180);
 
-    @Builder.Default
-    private List<String> lessonTopics = List.of("OOP", "Java installation", "Git", "Gradle", "Collections", "Concurrency", "Servlets");
-
     public Course buildCourse() {
-        return new Course(id, name, info, cost, discount, start, duration, lessonTopics);
+        return new Course(id, name, info, cost, discount, start, duration);
     }
 
     public List<Course> buildListOfCourses(){

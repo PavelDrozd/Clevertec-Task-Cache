@@ -3,7 +3,6 @@ package ru.clevertec.data;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.List;
 
 public record CourseDto(
 
@@ -17,7 +16,5 @@ public record CourseDto(
 
         LocalDate start,
 
-        Duration duration,
-
-        List<String> lessonTopics) {
+        Duration duration) {
 }
