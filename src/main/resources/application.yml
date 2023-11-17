@@ -8,5 +8,5 @@ database:
   autocommit: true
   timeout: 5
 cache:
-  use: LFU
+  type: LFU
   size: 10

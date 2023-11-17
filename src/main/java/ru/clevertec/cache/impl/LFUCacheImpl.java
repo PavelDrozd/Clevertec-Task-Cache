@@ -3,7 +3,6 @@ package ru.clevertec.cache.impl;
 import lombok.Getter;
 import lombok.Setter;
 import ru.clevertec.cache.Cache;
-import ru.clevertec.config.ConfigurationYamlManager;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,9 +37,9 @@ public class LFUCacheImpl<K, T> implements Cache<K, T> {
     /** Cache map for hold objects of type T and keys K. */
     private final Map<K, CacheEntry<T>> cacheMap = new LinkedHashMap<>();
 
-    /** Constructor with cache capacity initialization. */
-    public LFUCacheImpl() {
-        initialCapacity = Integer.parseInt(ConfigurationYamlManager.INSTANCE.getProperty("cache.size"));
+    /** Constructor accept int value of cache capacity. */
+    public LFUCacheImpl(int initialCapacity) {
+        this.initialCapacity = initialCapacity;
     }
 
     /**

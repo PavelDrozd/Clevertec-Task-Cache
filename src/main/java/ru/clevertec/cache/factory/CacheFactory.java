@@ -15,10 +15,11 @@ public enum CacheFactory {
 
     CacheFactory() {
         map = new HashMap<>();
-        String cacheConfig = ConfigurationYamlManager.INSTANCE.getProperty("cache.use");
-        switch (cacheConfig) {
-            case "LRU" -> map.put(Cache.class, new LFUCacheImpl<>());
-            case "LFU" -> map.put(Cache.class, new LRUCacheImpl<>());
+        String cacheType = ConfigurationYamlManager.INSTANCE.getProperty("cache.type");
+        int cacheSize = Integer.parseInt(ConfigurationYamlManager.INSTANCE.getProperty("cache.size"));
+        switch (cacheType) {
+            case "LRU" -> map.put(Cache.class, new LFUCacheImpl<>(cacheSize));
+            case "LFU" -> map.put(Cache.class, new LRUCacheImpl<>(cacheSize));
         }
 
     }
