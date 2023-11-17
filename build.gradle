@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id "io.freefair.lombok" version "6.5.1"
+    id "io.freefair.aspectj.post-compile-weaving" version "8.4"
 }
 
 group = 'ru.clevetec'
@@ -18,6 +19,7 @@ ext {
     snakeYamlVersion = '2.1'
     postgresVersion = '42.6.0'
     hikariCPVersion = '5.1.0'
+    aspectJVersion = '1.9.20.1'
 }
 
 dependencies {
@@ -29,6 +31,9 @@ dependencies {
     implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
 
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+
+    implementation "org.aspectj:aspectjweaver:${aspectJVersion}"
+    implementation "org.aspectj:aspectjrt:${aspectJVersion}"
 
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
 

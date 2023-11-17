@@ -1,6 +1,10 @@
 package ru.clevertec.dao.impl;
 
 import lombok.RequiredArgsConstructor;
+import ru.clevertec.aspect.Create;
+import ru.clevertec.aspect.Delete;
+import ru.clevertec.aspect.Get;
+import ru.clevertec.aspect.Update;
 import ru.clevertec.dao.CourseDao;
 import ru.clevertec.entity.Course;
 import ru.clevertec.exception.service.ValidationException;
@@ -11,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,22 +39,23 @@ public class CourseDaoImpl implements CourseDao {
 
     /** INSERT query to create a new row in the database. */
     private static final String INSERT_COURSE =
-            "INSERT INTO courses (id, name, info, cost, discount, start, duration) VALUES ( ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO courses (name, info, cost, discount, start, duration) VALUES (?, ?, ?, ?, ?, ?)";
 
     /** SELECT query to find course by ID */
-    private static final String SELECT_ACCOUNT_BY_ID = SELECT_COURSE + FROM_COURSES
-                                                       + "WHERE c.id = ? AND deleted = false";
+    private static final String SELECT_COURSE_BY_ID = SELECT_COURSE + FROM_COURSES
+                                                      + "WHERE c.id = ? AND deleted = false";
 
     /** SELECT query to find all courses from the database */
-    private static final String SELECT_ALL_ACCOUNTS = SELECT_COURSE + FROM_COURSES;
+    private static final String SELECT_ALL_COURSES = SELECT_COURSE + FROM_COURSES;
 
     /** UPDATE query for set new values in fields of course entity. */
     private static final String UPDATE_COURSE =
-            "UPDATE accounts SET name = ?, info = ?, cost = ?, discount = ?, start = ?, duration = ? WHERE id = ? AND deleted = false";
+            "UPDATE courses SET name = ?, info = ?, cost = ?, discount = ?, start = ?, duration = ? WHERE id = ? AND deleted = false";
 
     /** DELETE query by set deleted value true in course row by ID from the database. */
-    private static final String DELETE_ACCOUNT = "UPDATE accounts a SET  deleted = true WHERE a.id = ?";
+    private static final String DELETE_COURSE = "UPDATE courses a SET  deleted = true WHERE a.id = ?";
 
+    /** DataSource for create connection with database. */
     private final DataSource dataSource;
 
     /**
@@ -60,7 +66,7 @@ public class CourseDaoImpl implements CourseDao {
      */
     @Override
     public Course save(Course course) {
-        if (findById(course.getId()).isEmpty()) {
+        if (course.getId() == null) {
             return create(course);
         } else {
             return update(course);
@@ -76,7 +82,7 @@ public class CourseDaoImpl implements CourseDao {
     public List<Course> findAll() {
         List<Course> courses = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(SELECT_ALL_ACCOUNTS);
+            PreparedStatement statement = connection.prepareStatement(SELECT_ALL_COURSES);
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 courses.add(processCourse(result));
@@ -94,10 +100,11 @@ public class CourseDaoImpl implements CourseDao {
      * @return object type of Course from database.
      */
     @Override
+    @Get
     public Optional<Course> findById(UUID id) {
         try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(SELECT_ACCOUNT_BY_ID);
-            statement.setString(1, id.toString());
+            PreparedStatement statement = connection.prepareStatement(SELECT_COURSE_BY_ID);
+            statement.setObject(1, id);
             ResultSet result = statement.executeQuery();
             Course course = new Course();
             if (result.next()) {
@@ -115,10 +122,11 @@ public class CourseDaoImpl implements CourseDao {
      * @param id expected object of type UUID used as primary key.
      */
     @Override
+    @Delete
     public boolean deleteById(UUID id) {
         try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(DELETE_ACCOUNT);
-            statement.setString(1, id.toString());
+            PreparedStatement statement = connection.prepareStatement(DELETE_COURSE);
+            statement.setObject(1, id);
             return statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new ValidationException(e);
@@ -131,18 +139,24 @@ public class CourseDaoImpl implements CourseDao {
      * @param course expected object type of Course.
      * @return created object type of Course from database.
      */
+    @Create
     private Course create(Course course) {
         try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(INSERT_COURSE);
-            statement.setString(1, course.getId().toString());
-            statement.setString(2, course.getName());
-            statement.setString(3, course.getInfo());
-            statement.setBigDecimal(4, course.getCost());
-            statement.setBigDecimal(5, course.getDiscount());
-            statement.setObject(6, course.getStart());
-            statement.setLong(7, course.getDuration().toDays());
+            PreparedStatement statement = connection.prepareStatement(INSERT_COURSE, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, course.getName());
+            statement.setString(2, course.getInfo());
+            statement.setBigDecimal(3, course.getCost());
+            statement.setBigDecimal(4, course.getDiscount());
+            statement.setObject(5, course.getStart());
+            statement.setLong(6, course.getDuration().toDays());
             statement.executeUpdate();
-            return findById(course.getId()).orElseThrow();
+            ResultSet key = statement.getGeneratedKeys();
+            Course created = new Course();
+            if (key.next()) {
+                created = findById(UUID.fromString(key.getString("id")))
+                        .orElseThrow();
+            }
+            return created;
         } catch (SQLException e) {
             throw new ValidationException(e);
         }
@@ -154,6 +168,7 @@ public class CourseDaoImpl implements CourseDao {
      * @param course expected object type of Course.
      * @return updated object type of Course from database.
      */
+    @Update
     private Course update(Course course) {
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(UPDATE_COURSE);
@@ -163,7 +178,7 @@ public class CourseDaoImpl implements CourseDao {
             statement.setBigDecimal(4, course.getDiscount());
             statement.setObject(5, course.getStart());
             statement.setLong(6, course.getDuration().toDays());
-            statement.setString(7, course.getId().toString());
+            statement.setObject(7, course.getId());
             statement.executeUpdate();
             return findById(course.getId()).orElseThrow();
         } catch (SQLException e) {

@@ -7,3 +7,6 @@ database:
   max: 100
   autocommit: true
   timeout: 5
+cache:
+  use: LFU
+  size: 10
