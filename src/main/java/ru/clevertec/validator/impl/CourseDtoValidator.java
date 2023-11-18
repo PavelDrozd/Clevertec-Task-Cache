@@ -14,9 +14,18 @@ public class CourseDtoValidator implements ObjectValidator<CourseDto> {
 
     private final Validator validator;
 
-    public CourseDtoValidator() {
+    private static CourseDtoValidator INSTANCE;
+
+    private CourseDtoValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+
+    public static synchronized CourseDtoValidator getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new CourseDtoValidator();
+        }
+        return INSTANCE;
     }
 
     @Override
