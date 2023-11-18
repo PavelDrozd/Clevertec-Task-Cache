@@ -20,6 +20,10 @@ ext {
     postgresVersion = '42.6.0'
     hikariCPVersion = '5.1.0'
     aspectJVersion = '1.9.20.1'
+    javaxValidationVersion = '2.0.1.Final'
+    javaxVersion = '3.0.0'
+    javaxVersion = '3.0.0'
+    hibernateValidatorVersion = '6.2.5.Final'
 }
 
 dependencies {
@@ -35,6 +39,13 @@ dependencies {
     implementation "org.aspectj:aspectjweaver:${aspectJVersion}"
     implementation "org.aspectj:aspectjrt:${aspectJVersion}"
 
+    implementation "javax.validation:validation-api:${javaxValidationVersion}"
+
+    implementation "org.hibernate.validator:hibernate-validator:${hibernateValidatorVersion}"
+
+    implementation "javax.el:javax.el-api:${javaxVersion}"
+    implementation "org.glassfish:javax.el:${javaxVersion}"
+
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
 
     testImplementation "org.assertj:assertj-core:${assertJVersion}"
@@ -44,6 +55,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor "org.hibernate.validator:hibernate-validator-annotation-processor:${hibernateValidatorVersion}"
 }
 
 test {
