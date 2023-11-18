@@ -24,6 +24,7 @@ ext {
     javaxVersion = '3.0.0'
     javaxVersion = '3.0.0'
     hibernateValidatorVersion = '6.2.5.Final'
+    jacksonVersion = '2.16.0'
 }
 
 dependencies {
@@ -45,6 +46,11 @@ dependencies {
 
     implementation "javax.el:javax.el-api:${javaxVersion}"
     implementation "org.glassfish:javax.el:${javaxVersion}"
+
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}"
+
 
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
 
