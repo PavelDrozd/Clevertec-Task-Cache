@@ -1,0 +1,12 @@
+database:
+  driver: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/task_cache
+  user: postgres
+  password: root
+  min: 2
+  max: 100
+  autocommit: true
+  timeout: 5
+cache:
+  type: LFU
+  size: 10
