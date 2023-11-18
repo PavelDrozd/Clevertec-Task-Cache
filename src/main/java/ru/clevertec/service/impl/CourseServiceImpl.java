@@ -21,7 +21,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseDto create(CourseDto courseDto) {
         Course course = mapper.toCourse(courseDto);
-        Course saved = courseDao.save(course);
+        Course saved = courseDao.create(course);
         return mapper.toCourseDto(saved);
     }
 
@@ -39,8 +39,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDto update(UUID id, CourseDto courseDto) {
-        if (courseDao.findById(id).isEmpty()){
-            throw new NotFoundException("Course with id: " + id  + " not found.");
+        if (courseDao.findById(id).isEmpty()) {
+            throw new NotFoundException("Course with id: " + id + " not found.");
         }
         Course course = Course.builder()
                 .id(id)
@@ -51,13 +51,13 @@ public class CourseServiceImpl implements CourseService {
                 .start(courseDto.start())
                 .duration(courseDto.duration())
                 .build();
-        Course updated = courseDao.save(course);
+        Course updated = courseDao.update(course);
         return mapper.toCourseDto(updated);
     }
 
     @Override
     public void delete(UUID id) {
-        if (!courseDao.deleteById(id)){
+        if (!courseDao.deleteById(id)) {
             throw new NotFoundException("Course with id " + id + " not found");
         }
 

@@ -42,7 +42,7 @@ class CourseServiceImplTest {
         CourseDto expected = CourseDtoTestData.builder().build().buildCourseDto();
 
         Mockito.when(courseMapper.toCourse(courseDto)).thenReturn(course);
-        Mockito.when(courseDao.save(course)).thenReturn(course);
+        Mockito.when(courseDao.create(course)).thenReturn(course);
         Mockito.when(courseMapper.toCourseDto(course)).thenReturn(expected);
 
         // when
@@ -114,7 +114,7 @@ class CourseServiceImplTest {
         CourseDto expected = CourseDtoTestData.builder().build().buildCourseDto();
 
         Mockito.when(courseDao.findById(uuid)).thenReturn(Optional.of(course));
-        Mockito.when(courseDao.save(course)).thenReturn(course);
+        Mockito.when(courseDao.update(course)).thenReturn(course);
         Mockito.when(courseMapper.toCourseDto(course)).thenReturn(expected);
 
         // when

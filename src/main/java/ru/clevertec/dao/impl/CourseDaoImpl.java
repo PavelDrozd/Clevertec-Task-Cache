@@ -59,17 +59,32 @@ public class CourseDaoImpl implements CourseDao {
     private final DataSource dataSource;
 
     /**
-     * Method save entity in database.
+     * Method create entity in database.
      *
      * @param course expected object of type Course to save it.
      * @return saved Course object.
      */
     @Override
-    public Course save(Course course) {
-        if (course.getId() == null) {
-            return create(course);
-        } else {
-            return update(course);
+    @Create
+    public Course create(Course course) {
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(INSERT_COURSE, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, course.getName());
+            statement.setString(2, course.getInfo());
+            statement.setBigDecimal(3, course.getCost());
+            statement.setBigDecimal(4, course.getDiscount());
+            statement.setObject(5, course.getStart());
+            statement.setLong(6, course.getDuration().toDays());
+            statement.executeUpdate();
+            ResultSet key = statement.getGeneratedKeys();
+            Course created = new Course();
+            if (key.next()) {
+                created = findById(UUID.fromString(key.getString("id")))
+                        .orElseThrow();
+            }
+            return created;
+        } catch (SQLException e) {
+            throw new ValidationException(e);
         }
     }
 
@@ -117,6 +132,31 @@ public class CourseDaoImpl implements CourseDao {
     }
 
     /**
+     * Method update entity in database.
+     *
+     * @param course expected object type of Course.
+     * @return updated object type of Course from database.
+     */
+    @Override
+    @Update
+    public Course update(Course course) {
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(UPDATE_COURSE);
+            statement.setString(1, course.getName());
+            statement.setString(2, course.getInfo());
+            statement.setBigDecimal(3, course.getCost());
+            statement.setBigDecimal(4, course.getDiscount());
+            statement.setObject(5, course.getStart());
+            statement.setLong(6, course.getDuration().toDays());
+            statement.setObject(7, course.getId());
+            statement.executeUpdate();
+            return findById(course.getId()).orElseThrow();
+        } catch (SQLException e) {
+            throw new ValidationException(e);
+        }
+    }
+
+    /**
      * Method delete row in database by ID.
      *
      * @param id expected object of type UUID used as primary key.
@@ -133,58 +173,7 @@ public class CourseDaoImpl implements CourseDao {
         }
     }
 
-    /**
-     * Method process accepted Course entity and insert it in database.
-     *
-     * @param course expected object type of Course.
-     * @return created object type of Course from database.
-     */
-    @Create
-    private Course create(Course course) {
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(INSERT_COURSE, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, course.getName());
-            statement.setString(2, course.getInfo());
-            statement.setBigDecimal(3, course.getCost());
-            statement.setBigDecimal(4, course.getDiscount());
-            statement.setObject(5, course.getStart());
-            statement.setLong(6, course.getDuration().toDays());
-            statement.executeUpdate();
-            ResultSet key = statement.getGeneratedKeys();
-            Course created = new Course();
-            if (key.next()) {
-                created = findById(UUID.fromString(key.getString("id")))
-                        .orElseThrow();
-            }
-            return created;
-        } catch (SQLException e) {
-            throw new ValidationException(e);
-        }
-    }
 
-    /**
-     * Method process accepted Course entity and update it in database.
-     *
-     * @param course expected object type of Course.
-     * @return updated object type of Course from database.
-     */
-    @Update
-    private Course update(Course course) {
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(UPDATE_COURSE);
-            statement.setString(1, course.getName());
-            statement.setString(2, course.getInfo());
-            statement.setBigDecimal(3, course.getCost());
-            statement.setBigDecimal(4, course.getDiscount());
-            statement.setObject(5, course.getStart());
-            statement.setLong(6, course.getDuration().toDays());
-            statement.setObject(7, course.getId());
-            statement.executeUpdate();
-            return findById(course.getId()).orElseThrow();
-        } catch (SQLException e) {
-            throw new ValidationException(e);
-        }
-    }
 
     /**
      * Method for processing Course object to build a new.

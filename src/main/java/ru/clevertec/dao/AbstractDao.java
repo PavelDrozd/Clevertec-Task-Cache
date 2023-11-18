@@ -17,7 +17,7 @@ public interface AbstractDao<K, T> {
      * @param t Accepts a class of type T to create it.
      * @return new created class of type T.
      */
-    T save(T t);
+    T create(T t);
 
     /**
      * Return all object of type T.
@@ -33,6 +33,8 @@ public interface AbstractDao<K, T> {
      * @return object of type T.
      */
     Optional<T> findById(K id);
+
+    T update(T t);
 
     /**
      * Delete existing object by primary key.
