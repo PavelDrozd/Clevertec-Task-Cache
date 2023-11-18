@@ -28,22 +28,30 @@ public class Application {
         String json = "{\"name\":\"Groovy developer\",\"info\":\"Advanced course for Scala developer.\",\"cost\":3000,\"discount\":400,\"start\":\"2023-11-14\",\"duration\":\"PT2880H\"}";
 
         CourseDto scalaDev = processXMLAndValidate(xml);
+        System.out.println("Scala developer: " + scalaDev);
+
         CourseDto groovyDev = processJsonAndValidate(json);
+        System.out.println("Groovy developer: " + groovyDev);
 
         UUID scalaDevUuid = service.create(scalaDev);
+        System.out.println("Generated UUID of Scala developer: " + scalaDevUuid);
+
         UUID groovyDevUuid = service.create(groovyDev);
+        System.out.println("Generated UUID of Groovy developer: " + groovyDevUuid);
 
         List<CourseDto> all = service.getAll();
+        System.out.println("All courses: " + all);
 
         CourseDto newScalaDevCourse = new CourseDto("Pro Scala developer", "Pro level of Scala developer.",
                 BigDecimal.valueOf(1200), BigDecimal.valueOf(100),
                 LocalDate.of(2024, 1, 10), Duration.ofDays(60));
 
         service.update(scalaDevUuid, newScalaDevCourse);
+        System.out.println("Updated Scala developer: " + service.getById(scalaDevUuid));
 
         service.delete(groovyDevUuid);
 
-        CourseDto updatedScalaDev = service.getById(scalaDevUuid);
+        System.out.println("All courses after delete Groovy developer course: " + service.getAll());
     }
 
     private static CourseDto processXMLAndValidate(String xml) {

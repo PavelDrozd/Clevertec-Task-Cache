@@ -1,53 +1,45 @@
-# Задание:
+### Инструкция по запуску проекта:
 
-1. Создать любой gradle проект
-2. Проект должен быть совместим с java 17
-3. Придерживаться GitFlow: master -&gt; develop -&gt; feature/fix
-4. Создать реализацию кэша, используя алгоритмы LRU и LFU
-5. Создать в приложении слои service и dao (service будет вызывать слой
-   dao, слой dao будет временная замена database). В этих сервисах
-   реализовать CRUD операции для работы с entity. Работу организовать
-   через интерфейсы.
-6. Результат работы dao должен синхронизироваться с кешем через proxy
-   (или кастомная аннотация, или АОП/aspectj). При работе с entity
-   оперируем id. Алгоритм работы с кешем:
-   ● GET - ищем в кеше и если там данных нет, то достаем объект из
-   dao, сохраняем в кеш и возвращаем
-   ● POST - сохраняем в dao и потом сохраняем в кеше
-   ● DELETE - удаляем из dao и потом удаляем из кеша
-   ● PUT - обновление/вставка в dao и потом обновление/вставка в
-   кеше
+### Альтернативный запуск через Tomcat(Если нет докера):
 
-7. Алгоритм и максимальный размер коллекции должны читаться из
-   файла resources/application.yml
-8. Создать entity, в нем должно быть поле id и еще минимум 4 поля
-9. Service работает с dto
-10. Объекты (dto), которые принимает service, должны валидироваться. В
-    т.ч. добавить regex валидацию
-11. Кеши должны быть покрыты unit tests
-12. Должен содержать javadoc и описанный README.md
-13. Использовать lombok
-14. *Реализовать метод для получения информации в формате xml
-15. Заполнить и отправить форму
+- Создать базу данных в PostgreSQL с названием "task_cache"
+  (все конфигурационные параметры можно изменить в файле application.yml - src/main/resources/application.yml)
+- запустить SQL скрипт файл с schema.sql в папке src/main/resources
+- Запустить класс Application и использовать его как замену контроллеру.
 
-# Литература:
+### CRUD операции в Application классе:
+https://github.com/PavelDrozd/Clevertec-Task-Cache/blob/5d48ac3c07e939fff24364e0d639de650ce48129/src/main/java/ru/clevertec/Application.java
 
-### Cache:
+##### Пример обработки XML:
+- Отправляем XML в метод processXMLAndValidate: <CourseDto><name>Scala developer</name><info>An easy way to become a Scala developer.</info><cost>500</cost><discount>0</discount><start>2023-12-13</start><duration>PT720H</duration></CourseDto>
+- Получаем результат: Scala developer: CourseDto[name=Scala developer, info=An easy way to become a Scala developer., cost=500, discount=0, start=2023-12-13, duration=PT720H]
 
-- Least Frequently Used (LFU) Cache Implementation - Dinesh on Java
-  https://www.dineshonjava.com/least-frequently-used-lfu-cache-implementation/
-- Алгоритмы кэширования | Bimlibik
-  https://bimlibik.github.io/posts/cache-algorithms/
-- Creating a simple and generic cache manager in Java | by Marcello Passos | Medium
-  https://medium.com/@marcellogpassos/creating-a-simple-and-generic-cache-manager-in-java-e62e4204a10e
+##### Пример обработки JSON:
+- Отправляем JSON в метод processJSONAndValidate: {"name":"Groovy developer","info":"Advanced course for Scala developer.","cost":3000,"discount":400,"start":"2023-11-14","duration":"PT2880H"}
+- Получаем результат: Scala developer: CourseDto[name=Groovy developer, info=Advanced course for Scala developer., cost=3000, discount=400, start=2023-11-14, duration=PT2880H]
 
-### Proxy:
+##### Пример Create:
 
-- Java Dynamic proxy mechanism and how Spring is using it | by Spac Valentin | Medium
-  https://medium.com/@spac.valentin/java-dynamic-proxy-mechanism-and-how-spring-is-using-it-93756fc707d5
-- Dynamic Proxies in Java | Baeldung
-  https://www.baeldung.com/java-dynamic-proxies
-- Proxy (Java SE 17 &amp; JDK 17) (oracle.com)
-  https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/reflect/Proxy.html
-- Заместитель на Java (refactoring.guru)
-  https://refactoring.guru/ru/design-patterns/proxy/java/example
+- Отправляем CourseDto объекты в метод create в service;
+- Получаем результат сгенерированный UUID, например: 09f9b1d6-a68c-4a9d-bb35-180edec5d3d5
+
+##### Пример GetAll:
+
+- Вызываем метод getAll в service;
+- Получаем результат: [CourseDto[name=Pro Scala developer, info=Pro level of Scala developer., cost=1200.0, discount=100.0, start=2024-01-10, duration=PT1440H], 
+CourseDto[name=Groovy developer, info=Advanced course for Scala developer., cost=3000.0, discount=400.0, start=2023-11-14, duration=PT2880H]]
+
+##### Пример Get by ID:
+
+- Вызываем метод getById в service и передаём в него UUID объекта. например: 345dc84e-00e0-4710-a6e1-0477ba003b4d
+- Получаем результатом объект из базы данных, например: CourseDto[name=Groovy developer, info=Advanced course for Scala developer., cost=3000, discount=400, start=2023-11-14, duration=PT2880H]
+
+##### Пример Update:
+
+- Отправляем новый изменённый CourseDto в метод update в service: CourseDto[name=Scala developer, info=An easy way to become a Scala developer., cost=500.0, discount=0.0, start=2023-12-13, duration=PT720H]
+- Результат можно будет увидеть вызвав метод getById в service в который передать UUID этого объекта;
+
+##### Пример DeleteById:
+
+- Вызываем метод deleteById и передаём туда UUID объекта для удаления, например: 345dc84e-00e0-4710-a6e1-0477ba003b4d
+- Результат можно увидеть вызвав метод getAll в service где будет отсутствовать удалённый объект.
