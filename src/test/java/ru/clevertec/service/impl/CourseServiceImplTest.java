@@ -2,6 +2,8 @@ package ru.clevertec.service.impl;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -34,23 +36,25 @@ class CourseServiceImplTest {
     @InjectMocks
     private CourseServiceImpl courseService;
 
+    @Captor
+    private ArgumentCaptor<Course> captor;
+
     @Test
     void createShouldReturnExpectedCourseDto() {
         // given
         CourseDto courseDto = CourseDtoTestData.builder().build().buildCourseDto();
         Course course = CourseTestData.builder().build().buildCourse();
-        CourseDto expected = CourseDtoTestData.builder().build().buildCourseDto();
+        UUID expected = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
 
         Mockito.when(courseMapper.toCourse(courseDto)).thenReturn(course);
         Mockito.when(courseDao.create(course)).thenReturn(course);
-        Mockito.when(courseMapper.toCourseDto(course)).thenReturn(expected);
 
         // when
-        CourseDto actual = courseService.create(courseDto);
+        UUID actual = courseService.create(courseDto);
 
         // then
         assertThat(actual)
-                .isSameAs(expected);
+                .isEqualTo(expected);
     }
 
     @Test
@@ -87,7 +91,7 @@ class CourseServiceImplTest {
 
         // then
         assertThat(actual)
-                .isSameAs(expected);
+                .isEqualTo(expected);
     }
 
     @Test
@@ -110,35 +114,24 @@ class CourseServiceImplTest {
         // given
         UUID uuid = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
         CourseDto courseDto = CourseDtoTestData.builder().build().buildCourseDto();
-        Course course = CourseTestData.builder().build().buildCourse();
-        CourseDto expected = CourseDtoTestData.builder().build().buildCourseDto();
-
-        Mockito.when(courseDao.findById(uuid)).thenReturn(Optional.of(course));
-        Mockito.when(courseDao.update(course)).thenReturn(course);
-        Mockito.when(courseMapper.toCourseDto(course)).thenReturn(expected);
+        Course expected = CourseTestData.builder().build().buildCourse();
 
         // when
-        CourseDto actual = courseService.update(uuid, courseDto);
+        courseService.update(uuid, courseDto);
 
         // then
+        verify(courseDao)
+                .update(captor.capture());
+        Course actual = captor.getValue();
+
         assertThat(actual)
-                .isEqualTo(expected);
-    }
-
-    @Test
-    void updateShouldThrowNotFoundException() {
-        // given
-        UUID fakeUuid = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f0");
-        CourseDto courseDto = CourseDtoTestData.builder().build().buildCourseDto();
-        String expected = "not found";
-
-        // when
-        Exception exception = assertThrows(NotFoundException.class, () -> courseService.update(fakeUuid, courseDto));
-        String actual = exception.getMessage();
-
-        // then
-        assertThat(actual)
-                .contains(expected);
+                .hasFieldOrPropertyWithValue(Course.Fields.id, expected.getId())
+                .hasFieldOrPropertyWithValue(Course.Fields.name, expected.getName())
+                .hasFieldOrPropertyWithValue(Course.Fields.info, expected.getInfo())
+                .hasFieldOrPropertyWithValue(Course.Fields.cost, expected.getCost())
+                .hasFieldOrPropertyWithValue(Course.Fields.discount, expected.getDiscount())
+                .hasFieldOrPropertyWithValue(Course.Fields.start, expected.getStart())
+                .hasFieldOrPropertyWithValue(Course.Fields.duration, expected.getDuration());
     }
 
     @Test

@@ -13,10 +13,10 @@ public interface AbstractService<K, T> {
     /**
      * Accepts a class, create it and send in database.
      *
-     * @param t Accepts a class of type T to create it.
-     * @return new created class of type T.
+     * @param t expected object of type T to create it.
+     * @return K - key of new created object.
      */
-    T create(T t);
+    K create(T t);
 
     /**
      * Return all object of type T.
@@ -28,7 +28,7 @@ public interface AbstractService<K, T> {
     /**
      * Get object of type T by object K used as primary key and return it.
      *
-     * @param id accept object of type K used as primary key.
+     * @param id expected object of type K used as primary key.
      * @return object of type T.
      */
     T getById(K id);
@@ -38,14 +38,13 @@ public interface AbstractService<K, T> {
      *
      * @param id expected object of type K used as ID.
      * @param t expected object of type T.
-     * @return updated object of type T from DAO.
      */
-    T update(K id, T t);
+    void update(K id, T t);
 
     /**
      * Delete existing object by primary key.
      *
-     * @param id accept object of type K used as primary key.
+     * @param id expected object of type K used as primary key.
      */
     void delete(K id);
 
