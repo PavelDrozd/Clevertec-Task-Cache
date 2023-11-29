@@ -2,7 +2,7 @@ package ru.clevertec.cache.impl;
 
 import org.junit.jupiter.api.Test;
 import ru.clevertec.cache.Cache;
-import ru.clevertec.data.CourseTestData;
+import ru.clevertec.data.CourseTestBuilder;
 import ru.clevertec.entity.Course;
 
 import java.util.Optional;
@@ -17,19 +17,19 @@ class LFUCacheImplTest {
     @Test
     void putShouldReturnExpectedCourseAfterPutCoursesOverCacheSize() {
         // given
-        Course courseForPut1 = CourseTestData.builder()
+        Course courseForPut1 = CourseTestBuilder.builder()
                 .withId(UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f1"))
                 .withName("Java junior course")
                 .build().buildCourse();
-        Course courseForPut2 = CourseTestData.builder()
+        Course courseForPut2 = CourseTestBuilder.builder()
                 .withId(UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f2"))
                 .withName("Java advanced course")
                 .build().buildCourse();
-        Course courseForPut3 = CourseTestData.builder().build().buildCourse();
+        Course courseForPut3 = CourseTestBuilder.builder().build().buildCourse();
         UUID uuid1 = courseForPut1.getId();
         UUID uuid2 = courseForPut2.getId();
         UUID uuid3 = courseForPut3.getId();
-        Course expected = CourseTestData.builder().build().buildCourse();
+        Course expected = CourseTestBuilder.builder().build().buildCourse();
 
         // when
         cache.put(uuid1, courseForPut1);
@@ -45,9 +45,9 @@ class LFUCacheImplTest {
     @Test
     void getShouldReturnExpectedCourse() {
         // given
-        Course course = CourseTestData.builder().build().buildCourse();
+        Course course = CourseTestBuilder.builder().build().buildCourse();
         UUID uuid = course.getId();
-        Course expected = CourseTestData.builder().build().buildCourse();
+        Course expected = CourseTestBuilder.builder().build().buildCourse();
 
         // when
         cache.put(uuid, course);
@@ -60,11 +60,11 @@ class LFUCacheImplTest {
     @Test
     void sizeShouldReturnExpectedCurrentCacheSize() {
         // given
-        Course courseForPut1 = CourseTestData.builder()
+        Course courseForPut1 = CourseTestBuilder.builder()
                 .withId(UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f1"))
                 .withName("Java junior course")
                 .build().buildCourse();
-        Course courseForPut2 = CourseTestData.builder().build().buildCourse();
+        Course courseForPut2 = CourseTestBuilder.builder().build().buildCourse();
         UUID uuid1 = courseForPut1.getId();
         UUID uuid2 = courseForPut2.getId();
         int expected = 2;
@@ -93,7 +93,7 @@ class LFUCacheImplTest {
     @Test
     void removeShouldReturnOptionalEmpty() {
         // given
-        Course course = CourseTestData.builder().build().buildCourse();
+        Course course = CourseTestBuilder.builder().build().buildCourse();
         UUID uuid = course.getId();
 
         // when
@@ -108,7 +108,7 @@ class LFUCacheImplTest {
     @Test
     void clearShouldReturnIsEmptyTrue() {
         // given
-        Course course = CourseTestData.builder().build().buildCourse();
+        Course course = CourseTestBuilder.builder().build().buildCourse();
         UUID uuid = course.getId();
 
         // when

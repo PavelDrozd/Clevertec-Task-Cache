@@ -9,6 +9,8 @@ import ru.clevertec.service.CourseService;
 import ru.clevertec.service.factory.ServiceFactory;
 import ru.clevertec.validator.ObjectValidator;
 import ru.clevertec.validator.impl.CourseDtoValidator;
+import ru.clevertec.writer.CoursePdfWriter;
+import ru.clevertec.writer.factory.WriterFactory;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -19,9 +21,14 @@ import java.util.UUID;
 public class Application {
 
     private static final CourseService service = ServiceFactory.INSTANCE.getService(CourseService.class);
+
     private static final ObjectValidator<CourseDto> validator = CourseDtoValidator.getInstance();
+
     private static final ObjectMapper jsonMapper = MapperFactory.INSTANCE.getMapper(ObjectMapper.class);
+
     private static final XmlMapper xmlMapper = MapperFactory.INSTANCE.getMapper(XmlMapper.class);
+
+    private static final CoursePdfWriter pdfWriter = WriterFactory.INSTANCE.getWriter(CoursePdfWriter.class);
 
     public static void main(String[] args) {
         String xml = "<CourseDto><name>Scala developer</name><info>An easy way to become a Scala developer.</info><cost>500</cost><discount>0</discount><start>2023-12-13</start><duration>PT720H</duration></CourseDto>";
@@ -39,8 +46,10 @@ public class Application {
         UUID groovyDevUuid = service.create(groovyDev);
         System.out.println("Generated UUID of Groovy developer: " + groovyDevUuid);
 
-        List<CourseDto> all = service.getAll();
-        System.out.println("All courses: " + all);
+        List<CourseDto> courses = service.getAll();
+        System.out.println("All courses: " + courses);
+
+        pdfWriter.writePdf(courses);
 
         CourseDto newScalaDevCourse = new CourseDto("Pro Scala developer", "Pro level of Scala developer.",
                 BigDecimal.valueOf(1200), BigDecimal.valueOf(100),

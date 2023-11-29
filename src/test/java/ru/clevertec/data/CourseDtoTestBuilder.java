@@ -1,7 +1,6 @@
 package ru.clevertec.data;
 
 import lombok.Builder;
-import ru.clevertec.entity.Course;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Builder(setterPrefix = "with")
-public class CourseTestData {
+public class CourseDtoTestBuilder {
 
     @Builder.Default
     private UUID id = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
@@ -33,11 +32,11 @@ public class CourseTestData {
     @Builder.Default
     private Duration duration = Duration.ofDays(180);
 
-    public Course buildCourse() {
-        return new Course(id, name, info, cost, discount, start, duration);
+    public CourseDto buildCourseDto() {
+        return new CourseDto(name, info, cost, discount, start, duration);
     }
 
-    public List<Course> buildListOfCourses(){
-        return List.of(buildCourse());
+    public List<CourseDto> buildListOfCourseDtos() {
+        return List.of(buildCourseDto());
     }
 }

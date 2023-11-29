@@ -1,18 +1,16 @@
-package ru.clevertec.exception.service;
-
-import ru.clevertec.exception.ApplicationException;
+package ru.clevertec.exception;
 
 /**
- * Thrown to indicate that argument not found during a service operation.
+ * Thrown to indicate that an error has occurred during a validate service operation.
  */
-public class NotFoundException extends ApplicationException {
+public class ValidationException extends ApplicationException {
 
     /**
      * Constructs a new exception with {@code null} as its
      * detail message.  The cause is not initialized, and may subsequently be
      * initialized by a call to {@link #initCause}.
      */
-    public NotFoundException() {
+    public ValidationException() {
         super();
     }
 
@@ -24,7 +22,7 @@ public class NotFoundException extends ApplicationException {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public NotFoundException(String message) {
+    public ValidationException(String message) {
         super(message);
     }
 
@@ -42,7 +40,7 @@ public class NotFoundException extends ApplicationException {
      *                unknown.)
      * @since 1.4
      */
-    public NotFoundException(String message, Throwable cause) {
+    public ValidationException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -59,7 +57,7 @@ public class NotFoundException extends ApplicationException {
      *              unknown.)
      * @since 1.4
      */
-    public NotFoundException(Throwable cause) {
+    public ValidationException(Throwable cause) {
         super(cause);
     }
 }

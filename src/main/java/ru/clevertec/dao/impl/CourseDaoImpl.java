@@ -7,7 +7,7 @@ import ru.clevertec.aspect.Get;
 import ru.clevertec.aspect.Update;
 import ru.clevertec.dao.CourseDao;
 import ru.clevertec.entity.Course;
-import ru.clevertec.exception.service.ValidationException;
+import ru.clevertec.exception.ValidationException;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.clevertec.dao.CourseDao;
 import ru.clevertec.data.CourseDto;
 import ru.clevertec.entity.Course;
-import ru.clevertec.exception.service.NotFoundException;
+import ru.clevertec.exception.NotFoundException;
 import ru.clevertec.mapper.CourseMapper;
 import ru.clevertec.service.CourseService;
 

@@ -10,3 +10,7 @@ database:
 cache:
   type: LFU
   size: 10
+pdf:
+  background_path: src/main/resources/pdf/Clevertec_Template.pdf
+  output_path: output/result.pdf
+  font_path: src/main/resources/pdf/arial.ttf

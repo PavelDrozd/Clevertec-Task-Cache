@@ -2,7 +2,7 @@ package ru.clevertec.config;
 
 
 import org.yaml.snakeyaml.Yaml;
-import ru.clevertec.exception.service.NotFoundException;
+import ru.clevertec.exception.NotFoundException;
 
 import java.io.IOException;
 import java.io.InputStream;
