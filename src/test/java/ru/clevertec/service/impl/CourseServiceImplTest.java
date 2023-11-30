@@ -10,10 +10,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.clevertec.dao.CourseDao;
 import ru.clevertec.data.CourseDto;
-import ru.clevertec.data.CourseDtoTestData;
-import ru.clevertec.data.CourseTestData;
+import ru.clevertec.data.CourseDtoTestBuilder;
+import ru.clevertec.data.CourseTestBuilder;
 import ru.clevertec.entity.Course;
-import ru.clevertec.exception.service.NotFoundException;
+import ru.clevertec.exception.NotFoundException;
 import ru.clevertec.mapper.CourseMapper;
 
 import java.util.List;
@@ -42,8 +42,8 @@ class CourseServiceImplTest {
     @Test
     void createShouldReturnExpectedCourseDto() {
         // given
-        CourseDto courseDto = CourseDtoTestData.builder().build().buildCourseDto();
-        Course course = CourseTestData.builder().build().buildCourse();
+        CourseDto courseDto = CourseDtoTestBuilder.builder().build().buildCourseDto();
+        Course course = CourseTestBuilder.builder().build().buildCourse();
         UUID expected = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
 
         Mockito.when(courseMapper.toCourse(courseDto)).thenReturn(course);
@@ -60,10 +60,10 @@ class CourseServiceImplTest {
     @Test
     void getAllShouldReturnExpectedListOfCourseDtos() {
         // given
-        List<Course> courses = CourseTestData.builder().build().buildListOfCourses();
-        Course course = CourseTestData.builder().build().buildCourse();
-        CourseDto courseDto = CourseDtoTestData.builder().build().buildCourseDto();
-        List<CourseDto> expected = CourseDtoTestData.builder().build().buildListOfCourseDtos();
+        List<Course> courses = CourseTestBuilder.builder().build().buildListOfCourses();
+        Course course = CourseTestBuilder.builder().build().buildCourse();
+        CourseDto courseDto = CourseDtoTestBuilder.builder().build().buildCourseDto();
+        List<CourseDto> expected = CourseDtoTestBuilder.builder().build().buildListOfCourseDtos();
 
         Mockito.when(courseDao.findAll()).thenReturn(courses);
         Mockito.when(courseMapper.toCourseDto(course)).thenReturn(courseDto);
@@ -80,8 +80,8 @@ class CourseServiceImplTest {
     void getByIdShouldReturnExpectedCourse() {
         // given
         UUID uuid = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
-        Course course = CourseTestData.builder().build().buildCourse();
-        CourseDto expected = CourseDtoTestData.builder().build().buildCourseDto();
+        Course course = CourseTestBuilder.builder().build().buildCourse();
+        CourseDto expected = CourseDtoTestBuilder.builder().build().buildCourseDto();
 
         Mockito.when(courseDao.findById(uuid)).thenReturn(Optional.of(course));
         Mockito.when(courseMapper.toCourseDto(course)).thenReturn(expected);
@@ -113,8 +113,8 @@ class CourseServiceImplTest {
     void updateShouldReturnExpectedCourseDto() {
         // given
         UUID uuid = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
-        CourseDto courseDto = CourseDtoTestData.builder().build().buildCourseDto();
-        Course expected = CourseTestData.builder().build().buildCourse();
+        CourseDto courseDto = CourseDtoTestBuilder.builder().build().buildCourseDto();
+        Course expected = CourseTestBuilder.builder().build().buildCourse();
 
         // when
         courseService.update(uuid, courseDto);

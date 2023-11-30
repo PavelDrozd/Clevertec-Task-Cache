@@ -1,7 +1,7 @@
 package ru.clevertec.validator.impl;
 
 import ru.clevertec.data.CourseDto;
-import ru.clevertec.exception.service.ValidationException;
+import ru.clevertec.exception.ValidationException;
 import ru.clevertec.validator.ObjectValidator;
 
 import javax.validation.ConstraintViolation;

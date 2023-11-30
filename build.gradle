@@ -25,6 +25,7 @@ ext {
     javaxVersion = '3.0.0'
     hibernateValidatorVersion = '6.2.5.Final'
     jacksonVersion = '2.16.0'
+    itextpdfVersion = '8.0.2'
 }
 
 dependencies {
@@ -50,6 +51,8 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}"
+
+    implementation "com.itextpdf:itext-core:${itextpdfVersion}"
 
 
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
