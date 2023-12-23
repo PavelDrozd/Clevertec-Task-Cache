@@ -15,6 +15,7 @@ import ru.clevertec.data.CourseTestBuilder;
 import ru.clevertec.entity.Course;
 import ru.clevertec.exception.NotFoundException;
 import ru.clevertec.mapper.CourseMapper;
+import ru.clevertec.writer.CoursePdfWriter;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,9 @@ class CourseServiceImplTest {
 
     @Mock
     private CourseMapper courseMapper;
+
+    @Mock
+    private CoursePdfWriter coursePdfWriter;
 
     @InjectMocks
     private CourseServiceImpl courseService;

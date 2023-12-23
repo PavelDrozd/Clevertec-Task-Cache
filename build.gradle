@@ -1,11 +1,16 @@
 plugins {
     id 'java'
+    id 'war'
     id "io.freefair.lombok" version "6.5.1"
     id "io.freefair.aspectj.post-compile-weaving" version "8.4"
 }
 
-group = 'ru.clevetec'
+group = 'ru.clevertec'
 version = '1.0-SNAPSHOT'
+
+war {
+    archiveFileName = 'clevertec.war'
+}
 
 repositories {
     mavenCentral()
@@ -26,6 +31,7 @@ ext {
     hibernateValidatorVersion = '6.2.5.Final'
     jacksonVersion = '2.16.0'
     itextpdfVersion = '8.0.2'
+    javaxServletVersion = '4.0.1'
 }
 
 dependencies {
@@ -54,6 +60,11 @@ dependencies {
 
     implementation "com.itextpdf:itext-core:${itextpdfVersion}"
 
+    implementation "javax.servlet:javax.servlet-api:${javaxServletVersion}"
+
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'org.slf4j:slf4j-simple:2.0.7'
+    implementation 'ch.qos.logback:logback-core:1.4.11'
 
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
 

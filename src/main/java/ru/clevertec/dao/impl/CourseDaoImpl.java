@@ -7,6 +7,7 @@ import ru.clevertec.aspect.Get;
 import ru.clevertec.aspect.Update;
 import ru.clevertec.dao.CourseDao;
 import ru.clevertec.entity.Course;
+import ru.clevertec.exception.NotFoundException;
 import ru.clevertec.exception.ValidationException;
 
 import javax.sql.DataSource;
@@ -43,17 +44,22 @@ public class CourseDaoImpl implements CourseDao {
 
     /** SELECT query to find course by ID */
     private static final String SELECT_COURSE_BY_ID = SELECT_COURSE + FROM_COURSES
-                                                      + "WHERE c.id = ? AND deleted = false";
+                                                      + "WHERE c.id = ? AND c.deleted = false";
 
     /** SELECT query to find all courses from the database */
-    private static final String SELECT_ALL_COURSES = SELECT_COURSE + FROM_COURSES;
+    private static final String SELECT_ALL_COURSES = SELECT_COURSE + FROM_COURSES + "WHERE c.deleted = false";
+    private static final String SELECT_ALL_COURSES_PAGED = SELECT_COURSE + FROM_COURSES
+                                                           + "WHERE c.deleted = false LIMIT ? OFFSET ?";
 
     /** UPDATE query for set new values in fields of course entity. */
     private static final String UPDATE_COURSE =
             "UPDATE courses SET name = ?, info = ?, cost = ?, discount = ?, start = ?, duration = ? WHERE id = ? AND deleted = false";
 
     /** DELETE query by set deleted value true in course row by ID from the database. */
-    private static final String DELETE_COURSE = "UPDATE courses a SET  deleted = true WHERE a.id = ?";
+    private static final String DELETE_COURSE = "UPDATE courses c SET  deleted = true WHERE c.id = ?";
+
+    /** COUNT query for count all entities in database. */
+    private static final String COUNT = "SELECT count(*) AS total FROM courses c WHERE c.deleted = false";
 
     /** DataSource for create connection with database. */
     private final DataSource dataSource;
@@ -98,6 +104,30 @@ public class CourseDaoImpl implements CourseDao {
         List<Course> courses = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_COURSES);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                courses.add(processCourse(result));
+            }
+            return courses;
+        } catch (SQLException e) {
+            throw new ValidationException(e);
+        }
+    }
+
+    /**
+     * Method for find all course entities for accepted limit in database.
+     *
+     * @param limit  expected number of courses for return.
+     * @param offset expected started position of courses in database.
+     * @return List of Course objects.
+     */
+    @Override
+    public List<Course> findAll(long limit, long offset) {
+        List<Course> courses = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(SELECT_ALL_COURSES_PAGED);
+            statement.setLong(1, limit);
+            statement.setLong(2, offset);
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 courses.add(processCourse(result));
@@ -173,7 +203,19 @@ public class CourseDaoImpl implements CourseDao {
         }
     }
 
-
+    @Override
+    public long count() {
+        try (Connection connection = dataSource.getConnection()) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(COUNT);
+            if (!resultSet.next()) {
+                throw new NotFoundException("There is no entities in database.");
+            }
+            return resultSet.getLong("total");
+        } catch (SQLException e) {
+            throw new ValidationException(e);
+        }
+    }
 
     /**
      * Method for processing Course object to build a new.

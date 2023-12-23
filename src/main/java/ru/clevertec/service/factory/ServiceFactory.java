@@ -5,6 +5,8 @@ import ru.clevertec.dao.factory.DaoFactory;
 import ru.clevertec.mapper.CourseMapperImpl;
 import ru.clevertec.service.CourseService;
 import ru.clevertec.service.impl.CourseServiceImpl;
+import ru.clevertec.writer.CoursePdfWriter;
+import ru.clevertec.writer.factory.WriterFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +28,8 @@ public enum ServiceFactory {
     ServiceFactory() {
         map = new HashMap<>();
         map.put(CourseService.class, new CourseServiceImpl(DaoFactory.INSTANCE.getDao(CourseDao.class),
-                new CourseMapperImpl()));
+                new CourseMapperImpl(),
+                WriterFactory.INSTANCE.getWriter(CoursePdfWriter.class)));
     }
 
     /**
