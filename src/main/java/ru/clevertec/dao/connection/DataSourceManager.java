@@ -1,12 +1,17 @@
 package ru.clevertec.dao.connection;
 
 
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import ru.clevertec.config.ConfigurationYamlManager;
 import ru.clevertec.exception.ApplicationException;
+import ru.clevertec.reader.DataInputStreamReader;
 
 import javax.sql.DataSource;
+import java.io.InputStream;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * This class allows to create connection with database.
@@ -39,21 +44,19 @@ public enum DataSourceManager {
      * Constructor initialize HikariDataSource and set properties in it by yaml configuration.
      */
     DataSourceManager() {
-        try {
-            dataSource = new HikariDataSource();
-            ConfigurationYamlManager yaml = ConfigurationYamlManager.INSTANCE;
+        ConfigurationYamlManager yaml = ConfigurationYamlManager.INSTANCE;
+        HikariConfig hikariConfig = new HikariConfig();
 
-            dataSource.setDriverClassName(yaml.getProperty(DB_DRIVER));
-            dataSource.setJdbcUrl(yaml.getProperty(DB_URL));
-            dataSource.setUsername(yaml.getProperty(DB_USER));
-            dataSource.setPassword(yaml.getProperty(DB_PASSWORD));
-            dataSource.setMinimumIdle(Integer.parseInt(yaml.getProperty(DB_MIN_POOL)));
-            dataSource.setMaximumPoolSize(Integer.parseInt(yaml.getProperty(DB_MAX_POOL)));
-            dataSource.setAutoCommit(Boolean.parseBoolean(yaml.getProperty(DB_AUTO_COMMIT)));
-            dataSource.setLoginTimeout(Integer.parseInt(yaml.getProperty(DB_LOGIN_TIMEOUT)));
-        } catch (SQLException e) {
-            throw new ApplicationException("Exception connect to DataSource " + e);
-        }
+        hikariConfig.setDriverClassName(yaml.getProperty(DB_DRIVER));
+        hikariConfig.setJdbcUrl(yaml.getProperty(DB_URL));
+        hikariConfig.setUsername(yaml.getProperty(DB_USER));
+        hikariConfig.setPassword(yaml.getProperty(DB_PASSWORD));
+        hikariConfig.setMinimumIdle(Integer.parseInt(yaml.getProperty(DB_MIN_POOL)));
+        hikariConfig.setMaximumPoolSize(Integer.parseInt(yaml.getProperty(DB_MAX_POOL)));
+        hikariConfig.setAutoCommit(Boolean.parseBoolean(yaml.getProperty(DB_AUTO_COMMIT)));
+        hikariConfig.setConnectionTimeout(Integer.parseInt(yaml.getProperty(DB_LOGIN_TIMEOUT)));
+
+        dataSource = new HikariDataSource(hikariConfig);
     }
 
     /** Public method for get instance of DataSource. */
@@ -64,5 +67,15 @@ public enum DataSourceManager {
     /** Public method for close data source. */
     public void close() {
         dataSource.close();
+    }
+
+    public void executeSqlFile(InputStream inputStream) {
+        try (Connection connection = dataSource.getConnection()) {
+            Statement statement = connection.createStatement();
+            String sql = DataInputStreamReader.getString(inputStream);
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            throw new ApplicationException("Exception while trying execute SQL: " + e);
+        }
     }
 }
