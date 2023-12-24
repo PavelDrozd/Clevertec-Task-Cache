@@ -133,7 +133,7 @@ public class CourseCommandResolverImpl implements CourseCommandResolver {
     }
 
     private Paging getPaging(HttpServletRequest req) {
-        long limit = getLongFromString(req.getParameter("limit"));
+        long limit = getLongFromString(req.getParameter("pagesize"));
         long offset = getLongFromString(req.getParameter("offset"));
         long page = getLongFromString(req.getParameter("page"));
         long totalEntities = courseService.count();
