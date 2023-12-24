@@ -3,6 +3,7 @@ package ru.clevertec.dao.connection;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.extern.slf4j.Slf4j;
 import ru.clevertec.config.ConfigurationYamlManager;
 import ru.clevertec.exception.ApplicationException;
 import ru.clevertec.reader.DataInputStreamReader;
@@ -20,6 +21,7 @@ import java.util.Enumeration;
  * This class allows to create connection with database.
  * Enum values are available globally, and used as a singleton.
  */
+@Slf4j
 public enum DataSourceManager {
     INSTANCE;
 
@@ -69,11 +71,13 @@ public enum DataSourceManager {
 
     /** Public method for close data source. */
     public void close() {
+        log.debug("DataSourceManager close method");
         dataSource.close();
         deregisterDriver();
     }
 
     public void executeSqlFile(InputStream inputStream) {
+        log.debug("DataSourceManager executeSqlFile method");
         try (Connection connection = dataSource.getConnection()) {
             Statement statement = connection.createStatement();
             String sql = DataInputStreamReader.getString(inputStream);

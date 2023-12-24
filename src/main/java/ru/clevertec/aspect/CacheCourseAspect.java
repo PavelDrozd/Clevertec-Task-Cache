@@ -1,5 +1,6 @@
 package ru.clevertec.aspect;
 
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,6 +12,7 @@ import ru.clevertec.entity.Course;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Aspect
 public class CacheCourseAspect {
 
@@ -36,6 +38,7 @@ public class CacheCourseAspect {
     @Around(value = "getMethod()")
     @SuppressWarnings("unchecked")
     public Object getObject(ProceedingJoinPoint joinPoint) throws Throwable {
+        log.debug("CacheCourseAspect get method");
         UUID uuid = (UUID) joinPoint.getArgs()[0];
         Optional<Course> courseInCache = cache.get(uuid);
         if (courseInCache.isEmpty()) {
@@ -49,6 +52,7 @@ public class CacheCourseAspect {
 
     @Around(value = "createMethod()")
     public Object createObject(ProceedingJoinPoint joinPoint) throws Throwable {
+        log.debug("CacheCourseAspect create method");
         Course course = (Course) joinPoint.proceed();
         cache.put(course.getId(), course);
         return course;
@@ -56,6 +60,7 @@ public class CacheCourseAspect {
 
     @Around(value = "updateMethod()")
     public Object updateObject(ProceedingJoinPoint joinPoint) throws Throwable {
+        log.debug("CacheCourseAspect update method");
         Course course = (Course) joinPoint.proceed();
         cache.put(course.getId(), course);
         return course;
@@ -63,6 +68,7 @@ public class CacheCourseAspect {
 
     @Around(value = "deleteMethod()")
     public Object deleteObject(ProceedingJoinPoint joinPoint) throws Throwable {
+        log.debug("CacheCourseAspect delete method");
         UUID uuid = (UUID) joinPoint.getArgs()[0];
         Object proceed = joinPoint.proceed();
         cache.remove(uuid);

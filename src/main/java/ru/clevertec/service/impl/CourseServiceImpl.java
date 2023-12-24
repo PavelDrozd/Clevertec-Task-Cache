@@ -1,6 +1,7 @@
 package ru.clevertec.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.clevertec.dao.CourseDao;
 import ru.clevertec.data.CourseDto;
 import ru.clevertec.entity.Course;
@@ -16,6 +17,7 @@ import java.util.UUID;
 /**
  * Implementation of service interface for process course DTO objects.
  */
+@Slf4j
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
@@ -38,6 +40,7 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public UUID create(CourseDto courseDto) {
+        log.debug("CourseServiceImpl create method: " + courseDto);
         Course course = mapper.toCourse(courseDto);
         Course saved = courseDao.create(course);
         return saved.getId();
@@ -50,6 +53,7 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public List<CourseDto> getAll() {
+        log.debug("CourseServiceImpl get all method: ");
         return courseDao.findAll().stream().map(mapper::toCourseDto).toList();
     }
 
@@ -62,6 +66,7 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public List<CourseDto> getAll(long limit, long offset) {
+        log.debug("CourseServiceImpl get all method with limit: " + limit + " offset: " + offset);
         return courseDao.findAll(limit, offset).stream().map(mapper::toCourseDto).toList();
     }
 
@@ -73,6 +78,7 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public CourseDto getById(UUID id) {
+        log.debug("CourseServiceImpl get by ID method: " + id);
         Optional<Course> course = courseDao.findById(id);
         if (course.isEmpty()) {
             throw new NotFoundException("Course with id: " + id + " not found.");
@@ -90,6 +96,7 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public CourseDto update(UUID id, CourseDto courseDto) {
+        log.debug("CourseServiceImpl update method: " + courseDto);
         Course course = Course.builder()
                 .id(id)
                 .name(courseDto.name())
@@ -110,6 +117,7 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public void delete(UUID id) {
+        log.debug("CourseServiceImpl delete by ID method: " + id);
         if (!courseDao.deleteById(id)) {
             throw new NotFoundException("Course with id " + id + " not found");
         }
@@ -121,7 +129,8 @@ public class CourseServiceImpl implements CourseService {
      * @return count of courses.
      */
     @Override
-    public long count(){
+    public long count() {
+        log.debug("CourseServiceImpl count method");
         return courseDao.count();
     }
 }

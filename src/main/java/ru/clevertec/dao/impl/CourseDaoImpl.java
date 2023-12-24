@@ -1,6 +1,7 @@
 package ru.clevertec.dao.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.clevertec.aspect.Create;
 import ru.clevertec.aspect.Delete;
 import ru.clevertec.aspect.Get;
@@ -28,6 +29,7 @@ import java.util.UUID;
  * Implementation of DAO interface for process course objects.
  * Using datasource for connect to the database.
  */
+@Slf4j
 @RequiredArgsConstructor
 public class CourseDaoImpl implements CourseDao {
 
@@ -70,9 +72,10 @@ public class CourseDaoImpl implements CourseDao {
      * @param course expected object of type Course to save it.
      * @return saved Course object.
      */
-    @Override
     @Create
+    @Override
     public Course create(Course course) {
+        log.debug("CourseDaoImpl create method: " + course);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(INSERT_COURSE, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, course.getName());
@@ -101,6 +104,7 @@ public class CourseDaoImpl implements CourseDao {
      */
     @Override
     public List<Course> findAll() {
+        log.debug("CourseDaoImpl find all method");
         List<Course> courses = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_COURSES);
@@ -123,6 +127,7 @@ public class CourseDaoImpl implements CourseDao {
      */
     @Override
     public List<Course> findAll(long limit, long offset) {
+        log.debug("CourseDaoImpl find all method with limit: " + limit + " offset: " + offset);
         List<Course> courses = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_COURSES_PAGED);
@@ -144,9 +149,10 @@ public class CourseDaoImpl implements CourseDao {
      * @param id expected object of type UUID used as primary key.
      * @return object type of Course from database.
      */
-    @Override
     @Get
+    @Override
     public Optional<Course> findById(UUID id) {
+        log.debug("CourseDaoImpl find by ID method: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_COURSE_BY_ID);
             statement.setObject(1, id);
@@ -166,9 +172,10 @@ public class CourseDaoImpl implements CourseDao {
      * @param course expected object type of Course.
      * @return updated object type of Course from database.
      */
-    @Override
     @Update
+    @Override
     public Course update(Course course) {
+        log.debug("CourseDaoImpl update method: " + course);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(UPDATE_COURSE);
             statement.setString(1, course.getName());
@@ -190,9 +197,10 @@ public class CourseDaoImpl implements CourseDao {
      *
      * @param id expected object of type UUID used as primary key.
      */
-    @Override
     @Delete
+    @Override
     public boolean deleteById(UUID id) {
+        log.debug("CourseDaoImpl delete by ID method: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_COURSE);
             statement.setObject(1, id);
@@ -204,6 +212,7 @@ public class CourseDaoImpl implements CourseDao {
 
     @Override
     public long count() {
+        log.debug("CourseDaoImpl count method");
         try (Connection connection = dataSource.getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(COUNT);

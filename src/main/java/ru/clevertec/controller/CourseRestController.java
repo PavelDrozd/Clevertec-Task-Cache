@@ -29,6 +29,7 @@ public class CourseRestController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("CourseRestController doGet method");
         try {
             String jsonObject;
             if (req.getParameter("id") == null) {
@@ -51,6 +52,7 @@ public class CourseRestController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("CourseRestController doPost method");
         try {
             String jsonObject = commandResolver.create(req);
 
@@ -64,6 +66,7 @@ public class CourseRestController extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("CourseRestController doPut method");
         try {
             String jsonObject = commandResolver.update(req);
 
@@ -77,6 +80,7 @@ public class CourseRestController extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("CourseRestController doDelete method");
         try {
             commandResolver.delete(req);
 

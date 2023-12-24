@@ -30,6 +30,7 @@ public class WebContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        log.debug("WebContextListener init");
         ServletContext servletContext = sce.getServletContext();
         if (autoInit) {
             String schemaSqlPath = yaml.getProperty(SCHEMA_SQL);
@@ -43,6 +44,7 @@ public class WebContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        log.debug("WebContextListener destroy");
         ServletContext servletContext = sce.getServletContext();
         if (autoInit) {
             String dropSqlPath = yaml.getProperty(DROP_SQL);
