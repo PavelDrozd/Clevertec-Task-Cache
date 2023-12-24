@@ -48,6 +48,7 @@ public class WebContextListener implements ServletContextListener {
             String dropSqlPath = yaml.getProperty(DROP_SQL);
             executeSql(dropSqlPath, servletContext);
         }
+        dataSourceManager.close();
     }
 
     private void executeSql(String path, ServletContext servletContext) {

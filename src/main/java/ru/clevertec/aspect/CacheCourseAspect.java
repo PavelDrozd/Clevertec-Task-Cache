@@ -54,7 +54,7 @@ public class CacheCourseAspect {
         return course;
     }
 
-    @Around(value = "createMethod()")
+    @Around(value = "updateMethod()")
     public Object updateObject(ProceedingJoinPoint joinPoint) throws Throwable {
         Course course = (Course) joinPoint.proceed();
         cache.put(course.getId(), course);

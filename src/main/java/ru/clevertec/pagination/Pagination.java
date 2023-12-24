@@ -20,19 +20,11 @@ public class Pagination {
 
     public Paging getPaging(long limit, long offset, long currentPage, long totalEntities) {
         long definedLimit = getValidatedLimit(limit, totalEntities);
-        long totalPages = getTotalPages(totalEntities, limit);
+        long definedCurrentPage = getValidCurrentPage(currentPage);
+        long definedOffset = getValidOffset(offset, definedLimit, definedCurrentPage);
+        long totalPages = getTotalPages(totalEntities, definedLimit);
         long page = getPage(currentPage, totalPages);
-        return new Paging(definedLimit, offset, page, totalPages);
-    }
-
-    private long getPage(long currentPage, long totalPages) {
-        long page;
-        if (currentPage <= 0) {
-            page = 1;
-        } else {
-            page = Math.min(currentPage, totalPages);
-        }
-        return page;
+        return new Paging(definedLimit, definedOffset, page, totalPages);
     }
 
     private long getValidatedLimit(long limit, long totalEntities) {
@@ -43,9 +35,35 @@ public class Pagination {
         }
     }
 
-    private static long getTotalPages(long totalEntities, long limit) {
+    private long getValidCurrentPage(long currentPage) {
+        if (currentPage < 0) {
+            return 0;
+        } else {
+            return currentPage;
+        }
+    }
+
+    private long getValidOffset(long offset, long limit, long currentPage){
+        if (offset <= 0 && currentPage > 0) {
+            return (currentPage - 1) * limit;
+        } else {
+            return offset;
+        }
+    }
+
+    private long getTotalPages(long totalEntities, long limit) {
         long pages = totalEntities / limit;
         int additionalPage = (totalEntities - (pages * limit) > 0) ? 1 : 0;
         return pages + additionalPage;
+    }
+
+    private long getPage(long currentPage, long totalPages) {
+        long page;
+        if (currentPage <= 0) {
+            page = 1;
+        } else {
+            page = Math.min(currentPage, totalPages);
+        }
+        return page;
     }
 }

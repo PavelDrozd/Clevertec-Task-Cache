@@ -10,8 +10,11 @@ import ru.clevertec.reader.DataInputStreamReader;
 import javax.sql.DataSource;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Enumeration;
 
 /**
  * This class allows to create connection with database.
@@ -67,6 +70,7 @@ public enum DataSourceManager {
     /** Public method for close data source. */
     public void close() {
         dataSource.close();
+        deregisterDriver();
     }
 
     public void executeSqlFile(InputStream inputStream) {
@@ -76,6 +80,23 @@ public enum DataSourceManager {
             statement.executeUpdate(sql);
         } catch (SQLException e) {
             throw new ApplicationException("Exception while trying execute SQL: " + e);
+        }
+    }
+
+    private void deregisterDriver(){
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
+
+            if (driver instanceof org.postgresql.Driver) {
+                try {
+                    DriverManager.deregisterDriver(driver);
+
+                } catch (SQLException e) {
+                    throw new ApplicationException(e);
+                }
+            }
         }
     }
 }

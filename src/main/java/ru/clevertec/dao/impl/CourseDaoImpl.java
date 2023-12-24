@@ -151,11 +151,10 @@ public class CourseDaoImpl implements CourseDao {
             PreparedStatement statement = connection.prepareStatement(SELECT_COURSE_BY_ID);
             statement.setObject(1, id);
             ResultSet result = statement.executeQuery();
-            Course course = new Course();
             if (result.next()) {
-                course = processCourse(result);
+                return Optional.ofNullable(processCourse(result));
             }
-            return Optional.ofNullable(course);
+            throw new NotFoundException("Course with id: " + id + " not found.");
         } catch (SQLException e) {
             throw new ValidationException(e);
         }
@@ -180,7 +179,7 @@ public class CourseDaoImpl implements CourseDao {
             statement.setLong(6, course.getDuration().toDays());
             statement.setObject(7, course.getId());
             statement.executeUpdate();
-            return findById(course.getId()).orElseThrow();
+            return course;
         } catch (SQLException e) {
             throw new ValidationException(e);
         }

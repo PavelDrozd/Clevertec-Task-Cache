@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.clevertec.controller.command.CourseCommandResolver;
 import ru.clevertec.data.CourseDto;
+import ru.clevertec.data.Paging;
 import ru.clevertec.exception.InputStreamException;
 import ru.clevertec.exception.ValidationException;
+import ru.clevertec.pagination.Pagination;
 import ru.clevertec.reader.DataInputStreamReader;
 import ru.clevertec.service.CourseService;
 import ru.clevertec.validator.impl.CourseDtoValidator;
@@ -44,10 +46,13 @@ public class CourseCommandResolverImpl implements CourseCommandResolver {
     @Override
     public String getAll(HttpServletRequest req) {
         log.debug("Course get all command");
+        Paging paging = getPaging(req);
 
-        List<CourseDto> courses = courseService.getAll();
+        List<CourseDto> courses = courseService.getAll(paging.limit(), paging.offset());
 
         req.setAttribute("courses", courses);
+        req.setAttribute("page", paging.page());
+        req.setAttribute("total", paging.totalPages());
         req.setAttribute("status", 200);
 
         return writeJson(courses);
@@ -124,6 +129,24 @@ public class CourseCommandResolverImpl implements CourseCommandResolver {
             return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new ValidationException(e);
+        }
+    }
+
+    private Paging getPaging(HttpServletRequest req) {
+        long limit = getLongFromString(req.getParameter("limit"));
+        long offset = getLongFromString(req.getParameter("offset"));
+        long page = getLongFromString(req.getParameter("page"));
+        long totalEntities = courseService.count();
+
+        return Pagination.getInstance()
+                .getPaging(limit, offset, page, totalEntities);
+    }
+
+    private long getLongFromString(String value) {
+        if (value == null) {
+            return 0;
+        } else {
+            return Long.parseLong(value);
         }
     }
 }

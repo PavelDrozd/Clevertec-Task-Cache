@@ -3,6 +3,7 @@ package ru.clevertec.controller;
 import lombok.extern.slf4j.Slf4j;
 import ru.clevertec.controller.command.CourseCommandResolver;
 import ru.clevertec.controller.command.factory.CommandResolverFactory;
+import ru.clevertec.exception.NotFoundException;
 import ru.clevertec.exception.OutputStreamException;
 
 import javax.servlet.ServletException;
@@ -39,6 +40,10 @@ public class CourseRestController extends HttpServlet {
             setResponseOptions(req, resp);
             writeResponse(resp, jsonObject);
 
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            resp.setStatus(404);
+            writeResponse(resp, "404 Not found");
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -89,7 +94,7 @@ public class CourseRestController extends HttpServlet {
     }
 
     private void setResponseOptions(HttpServletRequest req, HttpServletResponse resp) {
-        resp.setContentType("application/json");
+        resp.setContentType("application/json;charset=UTF-8");
         resp.setStatus((int) req.getAttribute("status"));
     }
 

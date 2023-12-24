@@ -10,6 +10,7 @@ import ru.clevertec.service.CourseService;
 import ru.clevertec.writer.CoursePdfWriter;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -72,9 +73,11 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public CourseDto getById(UUID id) {
-        Course course = courseDao.findById(id)
-                .orElseThrow(() -> new NotFoundException("Course with id: " + id + " not found."));
-        CourseDto courseDto = mapper.toCourseDto(course);
+        Optional<Course> course = courseDao.findById(id);
+        if (course.isEmpty()) {
+            throw new NotFoundException("Course with id: " + id + " not found.");
+        }
+        CourseDto courseDto = mapper.toCourseDto(course.orElseThrow());
         pdfWriter.writePdf(courseDto);
         return courseDto;
     }
