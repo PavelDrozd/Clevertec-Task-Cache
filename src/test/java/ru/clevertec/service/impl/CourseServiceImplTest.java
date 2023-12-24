@@ -6,7 +6,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.clevertec.dao.CourseDao;
 import ru.clevertec.data.CourseDto;
@@ -24,6 +23,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CourseServiceImplTest {
@@ -50,8 +50,8 @@ class CourseServiceImplTest {
         Course course = CourseTestBuilder.builder().build().buildCourse();
         UUID expected = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
 
-        Mockito.when(courseMapper.toCourse(courseDto)).thenReturn(course);
-        Mockito.when(courseDao.create(course)).thenReturn(course);
+        when(courseMapper.toCourse(courseDto)).thenReturn(course);
+        when(courseDao.create(course)).thenReturn(course);
 
         // when
         UUID actual = courseService.create(courseDto);
@@ -69,11 +69,32 @@ class CourseServiceImplTest {
         CourseDto courseDto = CourseDtoTestBuilder.builder().build().buildCourseDto();
         List<CourseDto> expected = CourseDtoTestBuilder.builder().build().buildListOfCourseDtos();
 
-        Mockito.when(courseDao.findAll()).thenReturn(courses);
-        Mockito.when(courseMapper.toCourseDto(course)).thenReturn(courseDto);
+        when(courseDao.findAll()).thenReturn(courses);
+        when(courseMapper.toCourseDto(course)).thenReturn(courseDto);
 
         // when
         List<CourseDto> actual = courseService.getAll();
+
+        // then
+        assertThat(actual)
+                .hasSameElementsAs(expected);
+    }
+
+    @Test
+    void getAllPagingShouldReturnExpectedListOfCourseDtos() {
+        // given
+        long limit = 1L;
+        long offset = 0L;
+        List<Course> courses = CourseTestBuilder.builder().build().buildListOfCourses();
+        Course course = CourseTestBuilder.builder().build().buildCourse();
+        CourseDto courseDto = CourseDtoTestBuilder.builder().build().buildCourseDto();
+        List<CourseDto> expected = CourseDtoTestBuilder.builder().build().buildListOfCourseDtos();
+
+        when(courseDao.findAll(limit, offset)).thenReturn(courses);
+        when(courseMapper.toCourseDto(course)).thenReturn(courseDto);
+
+        // when
+        List<CourseDto> actual = courseService.getAll(limit, offset);
 
         // then
         assertThat(actual)
@@ -87,8 +108,8 @@ class CourseServiceImplTest {
         Course course = CourseTestBuilder.builder().build().buildCourse();
         CourseDto expected = CourseDtoTestBuilder.builder().build().buildCourseDto();
 
-        Mockito.when(courseDao.findById(uuid)).thenReturn(Optional.of(course));
-        Mockito.when(courseMapper.toCourseDto(course)).thenReturn(expected);
+        when(courseDao.findById(uuid)).thenReturn(Optional.of(course));
+        when(courseMapper.toCourseDto(course)).thenReturn(expected);
 
         // when
         CourseDto actual = courseService.getById(uuid);
@@ -143,7 +164,7 @@ class CourseServiceImplTest {
         // given
         UUID uuid = UUID.fromString("0116a46b-d57b-4bbc-a697-d4a7ace791f5");
 
-        Mockito.when(courseDao.deleteById(uuid)).thenReturn(true);
+        when(courseDao.deleteById(uuid)).thenReturn(true);
 
         // when
         courseService.delete(uuid);
@@ -165,5 +186,19 @@ class CourseServiceImplTest {
         // then
         assertThat(actual)
                 .contains(expected);
+    }
+
+    @Test
+    void countShouldReturnExpectedValue() {
+        // given
+        Long expected = 100L;
+        when(courseDao.count()).thenReturn(100L);
+
+        // when
+        Long actual = courseService.count();
+
+        // then
+        assertThat(actual)
+                .isEqualTo(expected);
     }
 }
