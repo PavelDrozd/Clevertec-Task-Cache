@@ -1,19 +1,23 @@
 package ru.clevertec.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.clevertec.dao.CourseDao;
 import ru.clevertec.data.CourseDto;
 import ru.clevertec.entity.Course;
 import ru.clevertec.exception.NotFoundException;
 import ru.clevertec.mapper.CourseMapper;
 import ru.clevertec.service.CourseService;
+import ru.clevertec.writer.CoursePdfWriter;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Implementation of service interface for process course DTO objects.
  */
+@Slf4j
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
@@ -24,6 +28,11 @@ public class CourseServiceImpl implements CourseService {
     private final CourseMapper mapper;
 
     /**
+     * Writer for create pdf files with course info.
+     */
+    private final CoursePdfWriter pdfWriter;
+
+    /**
      * Method for create new DTO class and send it to DAO.
      *
      * @param courseDto expected object of type CourseDto to create it.
@@ -31,6 +40,7 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public UUID create(CourseDto courseDto) {
+        log.debug("CourseServiceImpl create method: " + courseDto);
         Course course = mapper.toCourse(courseDto);
         Course saved = courseDao.create(course);
         return saved.getId();
@@ -43,7 +53,21 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public List<CourseDto> getAll() {
+        log.debug("CourseServiceImpl get all method: ");
         return courseDao.findAll().stream().map(mapper::toCourseDto).toList();
+    }
+
+    /**
+     * Method for getting all course DTO objects from DAO with expected limit.
+     *
+     * @param limit  expected number of courses for return.
+     * @param offset expected started position of courses in database.
+     * @return List of CourseDto.
+     */
+    @Override
+    public List<CourseDto> getAll(long limit, long offset) {
+        log.debug("CourseServiceImpl get all method with limit: " + limit + " offset: " + offset);
+        return courseDao.findAll(limit, offset).stream().map(mapper::toCourseDto).toList();
     }
 
     /**
@@ -54,9 +78,14 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public CourseDto getById(UUID id) {
-        Course course = courseDao.findById(id)
-                .orElseThrow(() -> new NotFoundException("Course with id: " + id + " not found."));
-        return mapper.toCourseDto(course);
+        log.debug("CourseServiceImpl get by ID method: " + id);
+        Optional<Course> course = courseDao.findById(id);
+        if (course.isEmpty()) {
+            throw new NotFoundException("Course with id: " + id + " not found.");
+        }
+        CourseDto courseDto = mapper.toCourseDto(course.orElseThrow());
+        pdfWriter.writePdf(courseDto);
+        return courseDto;
     }
 
     /**
@@ -66,7 +95,8 @@ public class CourseServiceImpl implements CourseService {
      * @param courseDto expected object of type T.
      */
     @Override
-    public void update(UUID id, CourseDto courseDto) {
+    public CourseDto update(UUID id, CourseDto courseDto) {
+        log.debug("CourseServiceImpl update method: " + courseDto);
         Course course = Course.builder()
                 .id(id)
                 .name(courseDto.name())
@@ -76,7 +106,8 @@ public class CourseServiceImpl implements CourseService {
                 .start(courseDto.start())
                 .duration(courseDto.duration())
                 .build();
-        courseDao.update(course);
+        Course updated = courseDao.update(course);
+        return mapper.toCourseDto(updated);
     }
 
     /**
@@ -86,9 +117,20 @@ public class CourseServiceImpl implements CourseService {
      */
     @Override
     public void delete(UUID id) {
+        log.debug("CourseServiceImpl delete by ID method: " + id);
         if (!courseDao.deleteById(id)) {
             throw new NotFoundException("Course with id " + id + " not found");
         }
+    }
 
+    /**
+     * Counting all courses.
+     *
+     * @return count of courses.
+     */
+    @Override
+    public long count() {
+        log.debug("CourseServiceImpl count method");
+        return courseDao.count();
     }
 }

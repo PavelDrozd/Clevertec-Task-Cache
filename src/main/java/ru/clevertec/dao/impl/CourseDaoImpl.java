@@ -1,12 +1,14 @@
 package ru.clevertec.dao.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.clevertec.aspect.Create;
 import ru.clevertec.aspect.Delete;
 import ru.clevertec.aspect.Get;
 import ru.clevertec.aspect.Update;
 import ru.clevertec.dao.CourseDao;
 import ru.clevertec.entity.Course;
+import ru.clevertec.exception.NotFoundException;
 import ru.clevertec.exception.ValidationException;
 
 import javax.sql.DataSource;
@@ -27,6 +29,7 @@ import java.util.UUID;
  * Implementation of DAO interface for process course objects.
  * Using datasource for connect to the database.
  */
+@Slf4j
 @RequiredArgsConstructor
 public class CourseDaoImpl implements CourseDao {
 
@@ -43,17 +46,22 @@ public class CourseDaoImpl implements CourseDao {
 
     /** SELECT query to find course by ID */
     private static final String SELECT_COURSE_BY_ID = SELECT_COURSE + FROM_COURSES
-                                                      + "WHERE c.id = ? AND deleted = false";
+                                                      + "WHERE c.id = ? AND c.deleted = false";
 
     /** SELECT query to find all courses from the database */
-    private static final String SELECT_ALL_COURSES = SELECT_COURSE + FROM_COURSES;
+    private static final String SELECT_ALL_COURSES = SELECT_COURSE + FROM_COURSES + "WHERE c.deleted = false";
+    private static final String SELECT_ALL_COURSES_PAGED = SELECT_COURSE + FROM_COURSES
+                                                           + "WHERE c.deleted = false LIMIT ? OFFSET ?";
 
     /** UPDATE query for set new values in fields of course entity. */
     private static final String UPDATE_COURSE =
             "UPDATE courses SET name = ?, info = ?, cost = ?, discount = ?, start = ?, duration = ? WHERE id = ? AND deleted = false";
 
     /** DELETE query by set deleted value true in course row by ID from the database. */
-    private static final String DELETE_COURSE = "UPDATE courses a SET  deleted = true WHERE a.id = ?";
+    private static final String DELETE_COURSE = "UPDATE courses c SET  deleted = true WHERE c.id = ?";
+
+    /** COUNT query for count all entities in database. */
+    private static final String COUNT = "SELECT count(*) AS total FROM courses c WHERE c.deleted = false";
 
     /** DataSource for create connection with database. */
     private final DataSource dataSource;
@@ -64,9 +72,10 @@ public class CourseDaoImpl implements CourseDao {
      * @param course expected object of type Course to save it.
      * @return saved Course object.
      */
-    @Override
     @Create
+    @Override
     public Course create(Course course) {
+        log.debug("CourseDaoImpl create method: " + course);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(INSERT_COURSE, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, course.getName());
@@ -95,9 +104,35 @@ public class CourseDaoImpl implements CourseDao {
      */
     @Override
     public List<Course> findAll() {
+        log.debug("CourseDaoImpl find all method");
         List<Course> courses = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_COURSES);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                courses.add(processCourse(result));
+            }
+            return courses;
+        } catch (SQLException e) {
+            throw new ValidationException(e);
+        }
+    }
+
+    /**
+     * Method for find all course entities for accepted limit in database.
+     *
+     * @param limit  expected number of courses for return.
+     * @param offset expected started position of courses in database.
+     * @return List of Course objects.
+     */
+    @Override
+    public List<Course> findAll(long limit, long offset) {
+        log.debug("CourseDaoImpl find all method with limit: " + limit + " offset: " + offset);
+        List<Course> courses = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(SELECT_ALL_COURSES_PAGED);
+            statement.setLong(1, limit);
+            statement.setLong(2, offset);
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 courses.add(processCourse(result));
@@ -114,18 +149,18 @@ public class CourseDaoImpl implements CourseDao {
      * @param id expected object of type UUID used as primary key.
      * @return object type of Course from database.
      */
-    @Override
     @Get
+    @Override
     public Optional<Course> findById(UUID id) {
+        log.debug("CourseDaoImpl find by ID method: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_COURSE_BY_ID);
             statement.setObject(1, id);
             ResultSet result = statement.executeQuery();
-            Course course = new Course();
             if (result.next()) {
-                course = processCourse(result);
+                return Optional.ofNullable(processCourse(result));
             }
-            return Optional.ofNullable(course);
+            throw new NotFoundException("Course with id: " + id + " not found.");
         } catch (SQLException e) {
             throw new ValidationException(e);
         }
@@ -137,9 +172,10 @@ public class CourseDaoImpl implements CourseDao {
      * @param course expected object type of Course.
      * @return updated object type of Course from database.
      */
-    @Override
     @Update
+    @Override
     public Course update(Course course) {
+        log.debug("CourseDaoImpl update method: " + course);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(UPDATE_COURSE);
             statement.setString(1, course.getName());
@@ -150,7 +186,7 @@ public class CourseDaoImpl implements CourseDao {
             statement.setLong(6, course.getDuration().toDays());
             statement.setObject(7, course.getId());
             statement.executeUpdate();
-            return findById(course.getId()).orElseThrow();
+            return course;
         } catch (SQLException e) {
             throw new ValidationException(e);
         }
@@ -161,9 +197,10 @@ public class CourseDaoImpl implements CourseDao {
      *
      * @param id expected object of type UUID used as primary key.
      */
-    @Override
     @Delete
+    @Override
     public boolean deleteById(UUID id) {
+        log.debug("CourseDaoImpl delete by ID method: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_COURSE);
             statement.setObject(1, id);
@@ -173,7 +210,20 @@ public class CourseDaoImpl implements CourseDao {
         }
     }
 
-
+    @Override
+    public long count() {
+        log.debug("CourseDaoImpl count method");
+        try (Connection connection = dataSource.getConnection()) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(COUNT);
+            if (!resultSet.next()) {
+                throw new NotFoundException("There is no entities in database.");
+            }
+            return resultSet.getLong("total");
+        } catch (SQLException e) {
+            throw new ValidationException(e);
+        }
+    }
 
     /**
      * Method for processing Course object to build a new.

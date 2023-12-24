@@ -39,7 +39,7 @@ public interface AbstractService<K, T> {
      * @param id expected object of type K used as ID.
      * @param t expected object of type T.
      */
-    void update(K id, T t);
+    T update(K id, T t);
 
     /**
      * Delete existing object by primary key.

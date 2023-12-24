@@ -1,10 +1,3 @@
-/*
-DROP DATABASE "task_cache";
-CREATE DATABASE "task_cache";
-
-DROP TABLE IF EXISTS courses;
-*/
-
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 create TABLE IF NOT EXISTS  courses (

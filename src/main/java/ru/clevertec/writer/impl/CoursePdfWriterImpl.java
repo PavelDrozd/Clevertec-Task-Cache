@@ -12,9 +12,12 @@ import com.itextpdf.layout.element.Paragraph;
 import ru.clevertec.config.ConfigurationYamlManager;
 import ru.clevertec.data.CourseDto;
 import ru.clevertec.exception.NotFoundException;
+import ru.clevertec.exception.OutputStreamException;
 import ru.clevertec.writer.CoursePdfWriter;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -38,10 +41,12 @@ public class CoursePdfWriterImpl implements CoursePdfWriter {
     private static final String DURATION = "Длительность: ";
     private static final String DAYS = " дней";
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Override
     public void writePdf(List<CourseDto> courses) {
+        checkOutput();
+
         try (PdfReader pdfReader = new PdfReader(BACKGROUND);
              PdfWriter pdfWriter = new PdfWriter(OUTPUT);
              PdfDocument pdfDocument = new PdfDocument(pdfWriter);
@@ -57,6 +62,7 @@ public class CoursePdfWriterImpl implements CoursePdfWriter {
                     document.add(new AreaBreak());
                 }
             }
+
         } catch (IOException e) {
             throw new NotFoundException(e);
         }
@@ -64,11 +70,14 @@ public class CoursePdfWriterImpl implements CoursePdfWriter {
 
     @Override
     public void writePdf(CourseDto course) {
+        checkOutput();
+
         try (PdfReader pdfReader = new PdfReader(BACKGROUND);
              PdfWriter pdfWriter = new PdfWriter(OUTPUT);
              PdfDocument pdfDocument = new PdfDocument(pdfReader, pdfWriter);
              Document document = new Document(pdfDocument)) {
             processDocument(course, document);
+
         } catch (IOException e) {
             throw new NotFoundException(e);
         }
@@ -77,7 +86,20 @@ public class CoursePdfWriterImpl implements CoursePdfWriter {
 
     @Override
     public void setDateTimeFormat(DateTimeFormatter formatter) {
-        formatter = formatter;
+        this.formatter = formatter;
+    }
+
+    private void checkOutput() {
+        Path outputPath = Path.of(OUTPUT);
+
+        if (Files.notExists(outputPath)) {
+            try {
+                Files.createDirectory(outputPath.getParent());
+
+            } catch (IOException e) {
+                throw new OutputStreamException(e);
+            }
+        }
     }
 
     private void processDocument(CourseDto course, Document document) throws IOException {
@@ -95,8 +117,10 @@ public class CoursePdfWriterImpl implements CoursePdfWriter {
 
     private void processParagraph(CourseDto course, PdfFont font, Document document) {
         Paragraph courseParagraph = buildParagraph(course);
+
         courseParagraph.setFont(font);
         courseParagraph.setRelativePosition(25f, 150f, 25f, 25f);
+
         document.add(courseParagraph);
     }
 
