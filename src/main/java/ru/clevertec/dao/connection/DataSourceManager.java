@@ -3,12 +3,17 @@ package ru.clevertec.dao.connection;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.clevertec.config.ConfigurationYamlManager;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import ru.clevertec.exception.ApplicationException;
+import ru.clevertec.exception.InputStreamException;
 import ru.clevertec.reader.DataInputStreamReader;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -22,72 +27,123 @@ import java.util.Enumeration;
  * Enum values are available globally, and used as a singleton.
  */
 @Slf4j
-public enum DataSourceManager {
-    INSTANCE;
+@Component
+@RequiredArgsConstructor
+public class DataSourceManager {
 
     /** Driver property in configuration file. */
-    private static final String DB_DRIVER = "database.driver";
+    @Value("${database.driver}")
+    private String DB_DRIVER;
     /** Url property in configuration file. */
-    private static final String DB_URL = "database.url";
+    @Value("${database.url}")
+    private String DB_URL;
     /** User property in configuration file. */
-    private static final String DB_USER = "database.user";
+    @Value("${database.user}")
+    private String DB_USER;
     /** Password property in configuration file. */
-    private static final String DB_PASSWORD = "database.password";
+    @Value("${database.password}")
+    private String DB_PASSWORD;
     /** Min pool size property in configuration file. */
-    private static final String DB_MIN_POOL = "database.min";
+    @Value("#{T(java.lang.Integer).parseInt('${database.min}')}")
+    private Integer DB_MIN_POOL;
     /** Max pool size property in configuration file. */
-    private static final String DB_MAX_POOL = "database.max";
+    @Value("#{T(java.lang.Integer).parseInt('${database.max}')}")
+    private Integer DB_MAX_POOL;
     /** Auto commit property in configuration file. */
-    private static final String DB_AUTO_COMMIT = "database.autocommit";
+    @Value("#{T(java.lang.Boolean).parseBoolean('${database.autocommit}')}")
+    private Boolean DB_AUTO_COMMIT;
     /** Timeout property in configuration file. */
-    private static final String DB_LOGIN_TIMEOUT = "database.timeout";
+    @Value("#{T(java.lang.Integer).parseInt('${database.timeout}')}")
+    private Integer DB_LOGIN_TIMEOUT;
+    /** Database auto initialize property in configuration file. */
+    @Value("#{T(java.lang.Boolean).parseBoolean('${database.auto_init}')}")
+    private Boolean AUTO_INIT;
+    /** Database initialize data property in configuration file. */
+    @Value("#{T(java.lang.Boolean).parseBoolean('${database.add_data}')}")
+    private Boolean ADD_DATA;
+    /** Schema sql file path property in configuration file. */
+    @Value("${database.sql.schema}")
+    private String SCHEMA_SQL;
+    /** Data sql file path property in configuration file. */
+    @Value("${database.sql.data}")
+    private String DATA_SQL;
+    /** Drop sql file path property in configuration file. */
+    @Value("${database.sql.drop}")
+    private String DROP_SQL;
 
     /** HikariDataSource used as main DataSource class. */
-    private final HikariDataSource dataSource;
+    private HikariDataSource dataSource;
 
-    /**
-     * Constructor initialize HikariDataSource and set properties in it by yaml configuration.
-     */
-    DataSourceManager() {
-        ConfigurationYamlManager yaml = ConfigurationYamlManager.INSTANCE;
+    private final DataInputStreamReader dataInputStreamReader;
+
+    @PostConstruct
+    public void init(){
         HikariConfig hikariConfig = new HikariConfig();
 
-        hikariConfig.setDriverClassName(yaml.getProperty(DB_DRIVER));
-        hikariConfig.setJdbcUrl(yaml.getProperty(DB_URL));
-        hikariConfig.setUsername(yaml.getProperty(DB_USER));
-        hikariConfig.setPassword(yaml.getProperty(DB_PASSWORD));
-        hikariConfig.setMinimumIdle(Integer.parseInt(yaml.getProperty(DB_MIN_POOL)));
-        hikariConfig.setMaximumPoolSize(Integer.parseInt(yaml.getProperty(DB_MAX_POOL)));
-        hikariConfig.setAutoCommit(Boolean.parseBoolean(yaml.getProperty(DB_AUTO_COMMIT)));
-        hikariConfig.setConnectionTimeout(Integer.parseInt(yaml.getProperty(DB_LOGIN_TIMEOUT)));
+        hikariConfig.setDriverClassName(DB_DRIVER);
+        hikariConfig.setJdbcUrl(DB_URL);
+        hikariConfig.setUsername(DB_USER);
+        hikariConfig.setPassword(DB_PASSWORD);
+        hikariConfig.setMinimumIdle(DB_MIN_POOL);
+        hikariConfig.setMaximumPoolSize(DB_MAX_POOL);
+        hikariConfig.setAutoCommit(DB_AUTO_COMMIT);
+        hikariConfig.setConnectionTimeout(DB_LOGIN_TIMEOUT);
 
         dataSource = new HikariDataSource(hikariConfig);
     }
 
-    /** Public method for get instance of DataSource. */
+    /** Get instance of DataSource method. */
     public DataSource getDataSource() {
         return dataSource;
     }
 
-    /** Public method for close data source. */
+    /** Close data source method. */
     public void close() {
         log.debug("DataSourceManager close method");
         dataSource.close();
         deregisterDriver();
     }
 
-    public void executeSqlFile(InputStream inputStream) {
+    /** Initialize database method. */
+    public void initDataBase() {
+        if (AUTO_INIT) {
+            executeSqlByPath(SCHEMA_SQL);
+        }
+        if (ADD_DATA) {
+            executeSqlByPath(DATA_SQL);
+        }
+    }
+
+    /** Drop database method. */
+    public void dropDataBase() {
+        if (AUTO_INIT) {
+            executeSqlByPath(DROP_SQL);
+        }
+    }
+
+    private void executeSqlByPath(String path) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        try (InputStream inputStream = classLoader.getResourceAsStream(path)) {
+            executeSqlFileByInputStream(inputStream);
+        } catch (IOException e) {
+            throw new InputStreamException(e);
+        }
+    }
+
+    private void executeSqlFileByInputStream(InputStream inputStream) {
         log.debug("DataSourceManager executeSqlFile method");
         try (Connection connection = dataSource.getConnection()) {
             Statement statement = connection.createStatement();
-            String sql = DataInputStreamReader.getString(inputStream);
+            String sql = dataInputStreamReader.getString(inputStream);
+
             statement.executeUpdate(sql);
+
         } catch (SQLException e) {
             throw new ApplicationException("Exception while trying execute SQL: " + e);
         }
     }
 
-    private void deregisterDriver(){
+    private void deregisterDriver() {
         Enumeration<Driver> drivers = DriverManager.getDrivers();
 
         while (drivers.hasMoreElements()) {

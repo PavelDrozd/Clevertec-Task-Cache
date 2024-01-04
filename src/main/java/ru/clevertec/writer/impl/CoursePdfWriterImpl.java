@@ -9,7 +9,8 @@ import com.itextpdf.kernel.utils.PdfMerger;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Paragraph;
-import ru.clevertec.config.ConfigurationYamlManager;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import ru.clevertec.data.CourseDto;
 import ru.clevertec.exception.NotFoundException;
 import ru.clevertec.exception.OutputStreamException;
@@ -21,15 +22,17 @@ import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Component
 public class CoursePdfWriterImpl implements CoursePdfWriter {
 
-    private final ConfigurationYamlManager yaml = ConfigurationYamlManager.INSTANCE;
+    @Value("${pdf.path.background}")
+    private String BACKGROUND;
 
-    private final String BACKGROUND = yaml.getProperty("pdf.background_path");
+    @Value("${pdf.path.font}")
+    private String ARIAL_FONT;
 
-    private final String ARIAL_FONT = yaml.getProperty("pdf.font_path");
-
-    private final String OUTPUT = yaml.getProperty("pdf.output_path");
+    @Value("${pdf.path.output}")
+    private String OUTPUT;
 
     private static final String LINE_BREAK = "\n";
     private static final String COURSE_NAME = "Название курса: ";
@@ -92,7 +95,7 @@ public class CoursePdfWriterImpl implements CoursePdfWriter {
     private void checkOutput() {
         Path outputPath = Path.of(OUTPUT);
 
-        if (Files.notExists(outputPath)) {
+        if (Files.notExists(outputPath.getParent())) {
             try {
                 Files.createDirectory(outputPath.getParent());
 
@@ -147,6 +150,4 @@ public class CoursePdfWriterImpl implements CoursePdfWriter {
                              DAYS +
                              LINE_BREAK);
     }
-
-
 }

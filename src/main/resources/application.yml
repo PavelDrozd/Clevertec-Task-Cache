@@ -9,15 +9,17 @@ database:
   timeout: 10000
   auto_init: true
   add_data: true
-  schema_sql: WEB-INF/classes/sql/schema.sql
-  data_sql: WEB-INF/classes/sql/data.sql
-  drop_sql: WEB-INF/classes/sql/drop.sql
+  sql:
+    schema: sql/schema.sql
+    data: sql/data.sql
+    drop: sql/drop.sql
 cache:
   type: LFU
   size: 10
 pdf:
-  background_path: pdf/Clevertec_Template.pdf
-  output_path: output/result.pdf
-  font_path: pdf/arial.ttf
+  path:
+    background: pdf/Clevertec_Template.pdf
+    output: output/result.pdf
+    font: pdf/arial.ttf
 pagination:
   limit: 20

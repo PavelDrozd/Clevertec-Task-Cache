@@ -1,5 +1,6 @@
 package ru.clevertec.validator.impl;
 
+import org.springframework.stereotype.Component;
 import ru.clevertec.data.CourseDto;
 import ru.clevertec.exception.ValidationException;
 import ru.clevertec.validator.ObjectValidator;
@@ -10,22 +11,14 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.Set;
 
+@Component
 public class CourseDtoValidator implements ObjectValidator<CourseDto> {
 
     private final Validator validator;
 
-    private static CourseDtoValidator INSTANCE;
-
-    private CourseDtoValidator() {
+    public CourseDtoValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-    }
-
-    public static synchronized CourseDtoValidator getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new CourseDtoValidator();
-        }
-        return INSTANCE;
     }
 
     @Override

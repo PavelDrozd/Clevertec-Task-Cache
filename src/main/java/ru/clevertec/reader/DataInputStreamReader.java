@@ -1,6 +1,7 @@
 package ru.clevertec.reader;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import ru.clevertec.exception.InputStreamException;
 
 import java.io.IOException;
@@ -9,10 +10,10 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
+@Component
 public class DataInputStreamReader {
 
-
-    public static String getString(InputStream inputStream) {
+    public String getString(InputStream inputStream) {
         try(InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
 
             StringBuilder sb = new StringBuilder();
@@ -29,7 +30,7 @@ public class DataInputStreamReader {
         }
     }
 
-    private static void closeInputStream(InputStream is) {
+    private void closeInputStream(InputStream is) {
         try {
             is.close();
         } catch (IOException e) {

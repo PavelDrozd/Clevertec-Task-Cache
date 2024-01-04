@@ -4,11 +4,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.clevertec.data.CourseDto;
 import ru.clevertec.entity.Course;
+import ru.clevertec.service.CourseService;
 
 /**
  * Interface for mapping course objects.
  */
-@Mapper
+@Mapper(componentModel = "spring", uses = CourseService.class)
 public interface CourseMapper {
 
     /**

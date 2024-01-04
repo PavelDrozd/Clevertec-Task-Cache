@@ -1,12 +1,13 @@
 package ru.clevertec.aspect;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
 import ru.clevertec.cache.Cache;
-import ru.clevertec.cache.factory.CacheFactory;
 import ru.clevertec.entity.Course;
 
 import java.util.Optional;
@@ -14,10 +15,11 @@ import java.util.UUID;
 
 @Slf4j
 @Aspect
+@Component
+@RequiredArgsConstructor
 public class CacheCourseAspect {
 
-    @SuppressWarnings("unchecked")
-    private final Cache<UUID, Course> cache = CacheFactory.INSTANCE.getCache(Cache.class);
+    private final Cache<UUID, Course> cache;
 
     @Pointcut("@annotation(ru.clevertec.aspect.Get)")
     public void getMethod() {
