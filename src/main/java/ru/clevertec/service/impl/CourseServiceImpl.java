@@ -2,6 +2,7 @@ package ru.clevertec.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import ru.clevertec.dao.CourseDao;
 import ru.clevertec.data.CourseDto;
 import ru.clevertec.entity.Course;
@@ -18,6 +19,7 @@ import java.util.UUID;
  * Implementation of service interface for process course DTO objects.
  */
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 

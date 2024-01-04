@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
 import ru.clevertec.controller.command.CourseCommandResolver;
 import ru.clevertec.data.CourseDto;
 import ru.clevertec.data.Paging;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
+@Controller
 @RequiredArgsConstructor
 public class CourseCommandResolverImpl implements CourseCommandResolver {
 
@@ -28,6 +30,10 @@ public class CourseCommandResolverImpl implements CourseCommandResolver {
     private final ObjectMapper objectMapper;
 
     private final CourseDtoValidator validator;
+
+    private final DataInputStreamReader dataInputStreamReader;
+
+    private final Pagination pagination;
 
     @Override
     public String get(HttpServletRequest req) {
@@ -109,7 +115,7 @@ public class CourseCommandResolverImpl implements CourseCommandResolver {
     private String readJsonFromRequest(HttpServletRequest req) {
         String json;
         try {
-            json = DataInputStreamReader.getString(req.getInputStream());
+            json = dataInputStreamReader.getString(req.getInputStream());
         } catch (IOException e) {
             throw new InputStreamException(e);
         }
@@ -138,8 +144,7 @@ public class CourseCommandResolverImpl implements CourseCommandResolver {
         long page = getLongFromString(req.getParameter("page"));
         long totalEntities = courseService.count();
 
-        return Pagination.getInstance()
-                .getPaging(limit, offset, page, totalEntities);
+        return pagination.getPaging(limit, offset, page, totalEntities);
     }
 
     private long getLongFromString(String value) {

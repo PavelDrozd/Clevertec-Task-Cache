@@ -2,6 +2,7 @@ package ru.clevertec.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 import ru.clevertec.aspect.Create;
 import ru.clevertec.aspect.Delete;
 import ru.clevertec.aspect.Get;
@@ -30,6 +31,7 @@ import java.util.UUID;
  * Using datasource for connect to the database.
  */
 @Slf4j
+@Repository
 @RequiredArgsConstructor
 public class CourseDaoImpl implements CourseDao {
 
@@ -50,6 +52,8 @@ public class CourseDaoImpl implements CourseDao {
 
     /** SELECT query to find all courses from the database */
     private static final String SELECT_ALL_COURSES = SELECT_COURSE + FROM_COURSES + "WHERE c.deleted = false";
+
+    /** SELECT query to find all courses with limit and offset from the database */
     private static final String SELECT_ALL_COURSES_PAGED = SELECT_COURSE + FROM_COURSES
                                                            + "WHERE c.deleted = false LIMIT ? OFFSET ?";
 

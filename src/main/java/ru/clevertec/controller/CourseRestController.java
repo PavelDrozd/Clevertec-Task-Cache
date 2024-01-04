@@ -2,9 +2,9 @@ package ru.clevertec.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.clevertec.controller.command.CourseCommandResolver;
-import ru.clevertec.controller.command.factory.CommandResolverFactory;
 import ru.clevertec.exception.NotFoundException;
 import ru.clevertec.exception.OutputStreamException;
+import ru.clevertec.listener.WebContextListener;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,11 +18,11 @@ import java.io.PrintWriter;
 @WebServlet("/courses")
 public class CourseRestController extends HttpServlet {
 
-    private final CourseCommandResolver commandResolver = CommandResolverFactory.INSTANCE
-            .getCommandResolver(CourseCommandResolver.class);
+    private CourseCommandResolver commandResolver;
 
     @Override
     public void init() throws ServletException {
+        commandResolver = WebContextListener.getContext().getBean(CourseCommandResolver.class);
         log.info("SERVLET INIT");
         super.init();
     }

@@ -1,22 +1,16 @@
 package ru.clevertec.pagination;
 
-import ru.clevertec.config.ConfigurationYamlManager;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import ru.clevertec.data.Paging;
 
+@Component
+@RequiredArgsConstructor
 public class Pagination {
 
-    private static final long DEFAULT_LIMIT = Long.parseLong(
-            ConfigurationYamlManager.INSTANCE.getProperty("pagination.limit"));
-
-    private static Pagination INSTANCE;
-
-    public static synchronized Pagination getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Pagination();
-        }
-        return INSTANCE;
-    }
-
+    @Value("#{T(java.lang.Long).parseLong('${pagination.limit}')}")
+    private long DEFAULT_LIMIT;
 
     public Paging getPaging(long limit, long offset, long currentPage, long totalEntities) {
         long definedLimit = getValidatedLimit(limit, totalEntities);
@@ -43,7 +37,7 @@ public class Pagination {
         }
     }
 
-    private long getValidOffset(long offset, long limit, long currentPage){
+    private long getValidOffset(long offset, long limit, long currentPage) {
         if (offset <= 0 && currentPage > 0) {
             return (currentPage - 1) * limit;
         } else {
