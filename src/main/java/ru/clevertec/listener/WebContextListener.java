@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.clevertec.config.AppConfiguration;
+import ru.clevertec.controller.CourseRestController;
 import ru.clevertec.dao.connection.DataSourceManager;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
@@ -22,6 +24,12 @@ public class WebContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         log.debug("WebContextListener init");
         context = new AnnotationConfigApplicationContext(AppConfiguration.class);
+
+        CourseRestController courseRestController = context.getBean(CourseRestController.class);
+        ServletContext servletContext = sce.getServletContext();
+
+        servletContext.addServlet("course", courseRestController)
+                .addMapping("/courses");
 
         dataSourceManager = context.getBean(DataSourceManager.class);
         dataSourceManager.initDataBase();

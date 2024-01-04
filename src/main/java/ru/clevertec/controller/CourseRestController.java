@@ -1,13 +1,12 @@
 package ru.clevertec.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import ru.clevertec.controller.command.CourseCommandResolver;
 import ru.clevertec.exception.NotFoundException;
 import ru.clevertec.exception.OutputStreamException;
-import ru.clevertec.listener.WebContextListener;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,17 +14,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @Slf4j
-@WebServlet("/courses")
+@Component
+@RequiredArgsConstructor
 public class CourseRestController extends HttpServlet {
 
-    private CourseCommandResolver commandResolver;
-
-    @Override
-    public void init() throws ServletException {
-        commandResolver = WebContextListener.getContext().getBean(CourseCommandResolver.class);
-        log.info("SERVLET INIT");
-        super.init();
-    }
+    private final CourseCommandResolver commandResolver;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
