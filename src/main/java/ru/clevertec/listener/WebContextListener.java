@@ -1,7 +1,6 @@
 package ru.clevertec.listener;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.clevertec.config.AppConfiguration;
 import ru.clevertec.controller.CourseRestController;
@@ -43,9 +42,5 @@ public class WebContextListener implements ServletContextListener {
         dataSourceManager.close();
 
         context.close();
-    }
-
-    public static ApplicationContext getContext() {
-        return context;
     }
 }
